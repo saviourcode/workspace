@@ -14,4 +14,5 @@ int main()
 {
     std::unique_ptr<Foundation> second_foundation{new Foundation{}};
     std::cout << "hello" << std::endl;
+    std::cout << "ok";
 }
