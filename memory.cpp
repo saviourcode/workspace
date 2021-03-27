@@ -3,15 +3,15 @@
 //
 
 #include <memory>
+#include <iostream>
 
 struct Foundation
 {
-    const char* founder;
+    const char *founder;
 };
 
 int main()
 {
-    std::unique_ptr<Foundation> second_foundation { new Foundation{}};
-
-
+    std::unique_ptr<Foundation> second_foundation{new Foundation{}};
+    std::cout << "hello" << std::endl;
 }
