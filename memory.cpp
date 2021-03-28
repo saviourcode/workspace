@@ -13,4 +13,5 @@ struct Foundation
 int main()
 {
     std::unique_ptr<Foundation> second_foundation{new Foundation{}};
+    
 }
