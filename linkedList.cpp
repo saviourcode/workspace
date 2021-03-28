@@ -129,7 +129,7 @@ void Node::DeltRec(Node *&temp, Node *&targetNode)
     temp = temp->next;
     return;
   }
-  if(temp->next == targetNode)
+  else if(temp->next == targetNode)
   {
     temp->next = targetNode->next;
     return;
