@@ -1,2 +1,5 @@
 .exe
 .out
+*_received
+input_*
+output_*
