@@ -40,7 +40,7 @@ struct Routing
 class Node
 {
 public:
-    Node();
+    Node(size_t ID, size_t duration, size_t dest, string dataMessage);
     ~Node();
 
 private:
@@ -58,13 +58,10 @@ private:
 
     // init the channels
     void setChannel();
-
-    //
 };
 
-Node::Node()
+Node::Node(size_t ID, size_t duration, size_t dest, string dataMessage = "") : ID(ID), duration(duration)
 {
-    ID = 0;
     setChannel();
 }
 
@@ -96,19 +93,26 @@ void Node::setChannel()
 
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
+    //Check number of arguments
+    if (argc < 4 || argc > 5)
     {
-        cout << "too few arguments passed" << endl;
+        cout << "too " << (argc < 4 ? "few " : "many ") << "arguments passed" << endl;
         return -1;
     }
 
-    string argv3(argv[3]);
-    if (argv3 == "-1")
-    {
-        cout << "y" << endl;
-    }
+    //Convert Char Array to long int
+    long int arg[3];
+    for (int i = 0; i < 3; i++)
+        arg[i] = strtol(argv[i + 1], NULL, 10);
 
-    Node node;
+    //Check if a node is going to send data or not
+    string data;
+    if (arg[2] == -1)
+        data = "";
+    else
+        data = argv[4];
+
+    Node node(arg[0], arg[1], arg[2], data);
 
     //Init the class of the nodes here
     //Check for the count of argc, throw exeception

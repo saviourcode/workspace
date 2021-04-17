@@ -3,4 +3,4 @@ rm -rf scenario_1
 mkdir -p scenario_1
 mingw32-make.exe
 cd ./scenario_1
-../bin/node.out
+../bin/node.out 1 100 -1
