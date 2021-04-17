@@ -1,6 +1,6 @@
 clear
 rm -rf scenario_1
 mkdir -p scenario_1
-mingw32-make.exe
+make
 cd ./scenario_1
-../bin/node.out 1 100 -1
+../bin/node.out 0 10 -1

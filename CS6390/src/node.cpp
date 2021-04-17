@@ -21,7 +21,7 @@ struct FileDescriptor
 
 struct Routing
 {
-    Routing(int dest, string dataMessage) : dest(dest), dataMessage(dataMessage), incomingNeighbor{{0}}{};
+    Routing(int dest, string dataMessage) : dest(dest), dataMessage(dataMessage), incomingNeighbor{{0}}, intree{{0}} {};
     // Destination Node
     int dest;
 
@@ -44,6 +44,9 @@ public:
     };
     ~Node();
 
+    // ID of the node
+    size_t ID;
+
     // Duration
     size_t duration;
 
@@ -51,9 +54,6 @@ public:
     void sendHello();
 
 private:
-    // ID of the node
-    size_t ID;
-
     // Channels of the Node
     FileDescriptor channel;
 
@@ -119,16 +119,17 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < node.duration; i++)
     {
         // Send Hello Message every 30 seconds
-        if(i%30==0)
+        if (i % 30 == 0)
             node.sendHello();
+            
         // Send In tree message every 10 seconds
-        if(i%10)
+        //if (i % 10)
 
         // Send Data message every 15 seconds
-        if(i%15)
-            
+        //if (i % 15)
+
         // Read the Input file and update the received file if neccessary
-        sleep(0.1);
+        sleep(1);
     }
 
     return 0;
