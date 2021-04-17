@@ -1,11 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#ifdef _WIN32
-#include <Windows.h>
-#else
+#include <cstdlib>
 #include <unistd.h>
-#endif
+
 
 using namespace std;
 
@@ -37,10 +35,10 @@ struct Routing
     string dataMessage;
 
     // Keep track of Incoming Neighbors
-    size_t incomingNeighbor[10][10]{0};
+    size_t incomingNeighbor[10][10]{{0}};
 
     // In-tree of a Node
-    size_t intree[10][10]{0};
+    size_t intree[10][10]{{0}};
 };
 
 class Node
@@ -87,12 +85,12 @@ void Node::setChannel()
     //cout << channel.receivedFileName << endl;
 
     //Create the Input channel
-    channel.input.open(channel.inputFileName, ofstream::out);
+    channel.input.open(channel.inputFileName.c_str(), ofstream::out);
     channel.input.close();
 
-    channel.input.open(channel.inputFileName, ifstream::in);
-    channel.output.open(channel.outputFileName, ofstream::out | ofstream::app);
-    channel.receivedData.open(channel.receivedFileName, ofstream::out | ofstream::app);
+    channel.input.open(channel.inputFileName.c_str(), ifstream::in);
+    channel.output.open(channel.outputFileName.c_str(), ofstream::out | ofstream::app);
+    channel.receivedData.open(channel.receivedFileName.c_str(), ofstream::out | ofstream::app);
 }
 
 int main(int argc, char *argv[])
