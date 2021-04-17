@@ -4,13 +4,7 @@
 #include <cstdlib>
 #include <unistd.h>
 
-
 using namespace std;
-
-/*
-Think about the class of the node, what all data structures will be required
-Think about what all member functions will be required to handle the files.
-*/
 
 struct FileDescriptor
 {
@@ -27,7 +21,7 @@ struct FileDescriptor
 
 struct Routing
 {
-    Routing(int dest, string dataMessage) : dest(dest), dataMessage(dataMessage){};
+    Routing(int dest, string dataMessage) : dest(dest), dataMessage(dataMessage), incomingNeighbor{{0}}{};
     // Destination Node
     int dest;
 
@@ -35,10 +29,10 @@ struct Routing
     string dataMessage;
 
     // Keep track of Incoming Neighbors
-    size_t incomingNeighbor[10][10]={{0}};
+    size_t incomingNeighbor[10][10];
 
     // In-tree of a Node
-    size_t intree[10][10]={{0}};
+    size_t intree[10][10];
 };
 
 class Node
@@ -52,6 +46,9 @@ public:
 
     // Duration
     size_t duration;
+
+    //Hello Message Sender
+    void sendHello();
 
 private:
     // ID of the node
@@ -80,10 +77,6 @@ void Node::setChannel()
     channel.outputFileName = string("output_") + char('0' + ID);
     channel.receivedFileName = char('0' + ID) + string("_received");
 
-    //cout << channel.inputFileName << endl;
-    //cout << channel.outputFileName << endl;
-    //cout << channel.receivedFileName << endl;
-
     //Create the Input channel
     channel.input.open(channel.inputFileName.c_str(), ofstream::out);
     channel.input.close();
@@ -91,6 +84,11 @@ void Node::setChannel()
     channel.input.open(channel.inputFileName.c_str(), ifstream::in);
     channel.output.open(channel.outputFileName.c_str(), ofstream::out | ofstream::app);
     channel.receivedData.open(channel.receivedFileName.c_str(), ofstream::out | ofstream::app);
+}
+
+void Node::sendHello()
+{
+    cout << "Hello " << ID << endl;
 }
 
 int main(int argc, char *argv[])
@@ -121,11 +119,16 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < node.duration; i++)
     {
         // Send Hello Message every 30 seconds
+        if(i%30==0)
+            node.sendHello();
         // Send In tree message every 10 seconds
-        // Send Data message every 15 seconds
-        // Read the Input file and update the received file if neccessary
+        if(i%10)
 
-        sleep(1);
+        // Send Data message every 15 seconds
+        if(i%15)
+            
+        // Read the Input file and update the received file if neccessary
+        sleep(0.1);
     }
 
     return 0;

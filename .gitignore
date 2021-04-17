@@ -1,5 +1,5 @@
-.exe
-.out
+*.exe
+*.out
 node
 controller
 *_received
