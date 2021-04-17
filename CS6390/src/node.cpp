@@ -1,6 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
 
 using namespace std;
 
@@ -24,31 +29,35 @@ struct FileDescriptor
 
 struct Routing
 {
+    Routing(int dest, string dataMessage) : dest(dest), dataMessage(dataMessage){};
     // Destination Node
-    size_t dest;
+    int dest;
 
     // Buffer for the data to be sent
     string dataMessage;
 
     // Keep track of Incoming Neighbors
-    size_t incomingNeighbor[10][10];
+    size_t incomingNeighbor[10][10]{0};
 
     // In-tree of a Node
-    size_t intree[10][10];
+    size_t intree[10][10]{0};
 };
 
 class Node
 {
 public:
-    Node(size_t ID, size_t duration, size_t dest, string dataMessage);
+    Node(size_t ID, size_t duration, int dest, string dataMessage) : ID(ID), duration(duration), msg(dest, dataMessage)
+    {
+        setChannel();
+    };
     ~Node();
+
+    // Duration
+    size_t duration;
 
 private:
     // ID of the node
     size_t ID;
-
-    // Duration
-    size_t duration;
 
     // Channels of the Node
     FileDescriptor channel;
@@ -59,11 +68,6 @@ private:
     // init the channels
     void setChannel();
 };
-
-Node::Node(size_t ID, size_t duration, size_t dest, string dataMessage = "") : ID(ID), duration(duration)
-{
-    setChannel();
-}
 
 Node::~Node()
 {
@@ -97,6 +101,7 @@ int main(int argc, char *argv[])
     if (argc < 4 || argc > 5)
     {
         cout << "too " << (argc < 4 ? "few " : "many ") << "arguments passed" << endl;
+        cout << "Requires: ID, Duration, Destination, Message(if Destination !=-1)" << endl;
         return -1;
     }
 
@@ -112,16 +117,16 @@ int main(int argc, char *argv[])
     else
         data = argv[4];
 
+    //Create a node
     Node node(arg[0], arg[1], arg[2], data);
 
-    //Init the class of the nodes here
-    //Check for the count of argc, throw exeception
+    for (size_t i = 0; i < node.duration; i++)
+    {
+        // Send Hello Message every 30 seconds
+        // Send In tree message every 10 seconds
+        // Send Data message every 15 seconds
+        // Read the Input file and update the received file if neccessary
 
-    //Built a driver to do the stuff within the particular duration
-    // Send Hello Message every 30 seconds
-    // Send In tree message every 10 seconds
-    // Send Data message every 15 seconds
-    // Read the Input file and update the received file if neccessary
-
-    //Add sleep(1) after for every one second,
+        sleep(1);
+    }
 }
