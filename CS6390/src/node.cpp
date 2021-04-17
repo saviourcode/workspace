@@ -35,10 +35,10 @@ struct Routing
     string dataMessage;
 
     // Keep track of Incoming Neighbors
-    size_t incomingNeighbor[10][10]{{0}};
+    size_t incomingNeighbor[10][10]={{0}};
 
     // In-tree of a Node
-    size_t intree[10][10]{{0}};
+    size_t intree[10][10]={{0}};
 };
 
 class Node
