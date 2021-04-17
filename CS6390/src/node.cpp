@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ostream>
 #include <fstream>
 #include <string>
 #include <cstdlib>
@@ -40,7 +41,7 @@ class Node
 public:
     Node(size_t ID, size_t duration, int dest, string dataMessage) : ID(ID), duration(duration), msg(dest, dataMessage)
     {
-        setChannel();
+        setChannels();
     };
     ~Node();
 
@@ -61,17 +62,18 @@ private:
     Routing msg;
 
     // init the channels
-    void setChannel();
+    void setChannels();
 };
 
 Node::~Node()
 {
+    // Close the channels
     channel.input.close();
     channel.output.close();
     channel.receivedData.close();
 }
 
-void Node::setChannel()
+void Node::setChannels()
 {
     channel.inputFileName = string("input_") + char('0' + ID);
     channel.outputFileName = string("output_") + char('0' + ID);
@@ -88,7 +90,8 @@ void Node::setChannel()
 
 void Node::sendHello()
 {
-    cout << "Hello " << ID << endl;
+    channel.output << "Hello " << ID++ << endl;
+    channel.output.flush();
 }
 
 int main(int argc, char *argv[])
@@ -119,7 +122,7 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < node.duration; i++)
     {
         // Send Hello Message every 30 seconds
-        if (i % 30 == 0)
+        if (i % 2 == 0)
             node.sendHello();
             
         // Send In tree message every 10 seconds
@@ -131,6 +134,8 @@ int main(int argc, char *argv[])
         // Read the Input file and update the received file if neccessary
         sleep(1);
     }
+
+    cout << "Node Done" << endl;
 
     return 0;
 }
