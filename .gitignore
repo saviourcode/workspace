@@ -1,5 +1,7 @@
 .exe
 .out
+node
+controller
 *_received
 input_*
 output_*
