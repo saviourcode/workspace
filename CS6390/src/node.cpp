@@ -47,6 +47,9 @@ private:
     // ID of the node
     size_t ID;
 
+    // Duration
+    size_t duration;
+
     // Channels of the Node
     FileDescriptor channel;
 
@@ -78,9 +81,9 @@ void Node::setChannel()
     channel.outputFileName = string("output_") + char('0' + ID);
     channel.receivedFileName = char('0' + ID) + string("_received");
 
-    cout << channel.inputFileName << endl;
-    cout << channel.outputFileName << endl;
-    cout << channel.receivedFileName << endl;
+    //cout << channel.inputFileName << endl;
+    //cout << channel.outputFileName << endl;
+    //cout << channel.receivedFileName << endl;
 
     //Create the Input channel
     channel.input.open(channel.inputFileName, ofstream::out);
@@ -91,9 +94,21 @@ void Node::setChannel()
     channel.receivedData.open(channel.receivedFileName, ofstream::out | ofstream::app);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    Node n;
+    if (argc < 4)
+    {
+        cout << "too few arguments passed" << endl;
+        return -1;
+    }
+
+    string argv3(argv[3]);
+    if (argv3 == "-1")
+    {
+        cout << "y" << endl;
+    }
+
+    Node node;
 
     //Init the class of the nodes here
     //Check for the count of argc, throw exeception
