@@ -28,6 +28,12 @@ public:
     // Channels of Controller
     FileDescriptor *channels;
 
+    // Topology Links
+    int topologyLinks[10][10] = {{0}};
+
+    // Counter to check if the node is not responding
+    int nodeNotResponding[10] = {0};
+
     // Create the channels
     void createChannels();
 };
@@ -108,6 +114,8 @@ void Controller::parseString(string line) //Waring: Single Sequencial Digit Pars
         else
             nodes.numNodes = c2 - '0' + 1;
     }
+
+    nodes.topologyLinks[unsigned(c1 - '0')][unsigned(c2 - '0')] = 1;
 }
 
 void Controller::createNodeChannels()
@@ -153,10 +161,26 @@ string Controller::readFile(fstream& fd)
 
 void Controller::helloProtocol()
 {
+    // Search through the topology links to find the neighbors
     for(size_t i = 0;i < nodes.numNodes;i++)
     {
-        nodes.channels[i].output << readFile(nodes.channels[i].input);
-        nodes.channels[i].output.flush();
+        // Read the output file of the node for the hello message
+        string line = readFile(nodes.channels[i].input);
+
+        // If the read is empty don't transmit
+        if(line != "")
+        {
+            // Go through all the links of that particular nodes
+            for(size_t j = 0; j< nodes.numNodes; j++)
+            {
+                // If the link exist then put the message of that nodes input file
+                if(nodes.topologyLinks[i][j])
+                {
+                    nodes.channels[j].output << line << endl;
+                    nodes.channels[j].output.flush();
+                }
+            }
+        }
     }
 }
 
@@ -175,6 +199,8 @@ int main(int argc, char *argv[])
 
     // Let the nodes get init
     sleep(1);
+
+    cout << endl;
 
     //Create a node
     Controller controller(arg);

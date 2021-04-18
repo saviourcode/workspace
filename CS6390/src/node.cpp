@@ -1,5 +1,4 @@
 #include <iostream>
-#include <ostream>
 #include <fstream>
 #include <string>
 #include <cstdlib>
@@ -30,10 +29,13 @@ struct Routing
     string dataMessage;
 
     // Keep track of Incoming Neighbors
-    size_t incomingNeighbor[10][10];
+    int incomingNeighbors[10] = {0};
+
+    // Keep track of Outgoing Neighbors
+    int outgoingNeighbors[10] = {0};
 
     // In-tree of a Node
-    size_t intree[10][10];
+    int intree[10][10];
 };
 
 class Node
@@ -52,7 +54,7 @@ public:
     size_t duration;
 
     //Hello Message Sender
-    void sendHello();
+    void helloProtocol();
 
 private:
     // Channels of the Node
@@ -81,32 +83,41 @@ void Node::setChannels()
 
     channel.input.open(channel.inputFileName.c_str(), ios::out);
     channel.input.close();
-    
+
     channel.input.open(channel.inputFileName.c_str(), ios::in);
     channel.output.open(channel.outputFileName.c_str(), ios::out | ios::app);
     channel.receivedData.open(channel.receivedFileName.c_str(), ios::out | ios::app);
 
-    if(channel.input.fail())
+    if (channel.input.fail())
     {
         cout << "Node " << ID << ": No input file" << endl;
         exit(1);
     }
-    if(channel.output.fail())
+    if (channel.output.fail())
     {
         cout << "Node " << ID << ": No output file" << endl;
         exit(1);
     }
-    if(channel.receivedData.fail())
+    if (channel.receivedData.fail())
     {
         cout << "Node " << ID << ": No receivedData file" << endl;
         exit(1);
     }
 }
 
-void Node::sendHello()
+void Node::helloProtocol()
 {
+    // Send the Hello Message on the Output file for the controller to read
     channel.output << "Hello " << ID << endl;
     channel.output.flush();
+
+    // Read the Input file to check for the message
+    // and then update the incoming neighbors
+
+    while((string line = readFile(channel.input)) != "")
+    {
+        
+    }
 }
 
 int main(int argc, char *argv[])
@@ -138,8 +149,8 @@ int main(int argc, char *argv[])
     {
         // Send Hello Message every 30 seconds
         if (i % 30 == 0)
-            node.sendHello();
-            
+            node.helloProtocol();
+
         // Send In tree message every 10 seconds
         //if (i % 10)
 
