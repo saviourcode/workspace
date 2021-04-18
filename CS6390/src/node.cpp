@@ -65,6 +65,9 @@ private:
 
     // init the channels
     void setChannels();
+
+    // read the file contents line by line
+    string readFile(fstream &);
 };
 
 Node::~Node()
@@ -105,6 +108,19 @@ void Node::setChannels()
     }
 }
 
+string Node::readFile(fstream &fd)
+{
+    string line = "";
+    getline(fd, line);
+    if (fd.eof())
+    {
+        fd.clear();
+        line = "";
+    }
+    //cout << "Bad:" << channel.input.bad() << " EOF:" << channel.input.eof() << " Fail:" << channel.input.fail() << " GOOD:"<< channel.input.good();
+    return line;
+}
+
 void Node::helloProtocol()
 {
     // Send the Hello Message on the Output file for the controller to read
@@ -114,9 +130,9 @@ void Node::helloProtocol()
     // Read the Input file to check for the message
     // and then update the incoming neighbors
 
-    while((string line = readFile(channel.input)) != "")
+    while ((string line = readFile(channel.input)) != "")
     {
-        
+        cout << line << endl;
     }
 }
 
