@@ -72,8 +72,8 @@ public:
     // Duration
     size_t duration;
 
-    // Read File
-    string readFile();
+    //Hello Protocol
+    void helloProtocol();
 
 private:
     // Channels of Controller
@@ -90,6 +90,9 @@ private:
 
     //Parse the strings
     void parseString(string);
+
+    // Read File
+    string readFile(fstream&);
 };
 
 void Controller::parseString(string line) //Waring: Single Sequencial Digit Parser only!!
@@ -135,18 +138,26 @@ void Controller::setChannel()
     }
 }
 
-string Controller::readFile()
+string Controller::readFile(fstream& fd)
 {
     string line = "";
-    getline(channel.input, line);
-    if (channel.input.eof())
+    getline(fd, line);
+    if (fd.eof())
     {
-        channel.input.clear();
+        fd.clear();
         line = "";
     }
     //cout << "Bad:" << channel.input.bad() << " EOF:" << channel.input.eof() << " Fail:" << channel.input.fail() << " GOOD:"<< channel.input.good();
-    cout << line << endl;
     return line;
+}
+
+void Controller::helloProtocol()
+{
+    for(size_t i = 0;i < nodes.numNodes;i++)
+    {
+        nodes.channels[i].output << readFile(nodes.channels[i].input);
+        nodes.channels[i].output.flush();
+    }
 }
 
 int main(int argc, char *argv[])
@@ -163,7 +174,7 @@ int main(int argc, char *argv[])
     long int arg = strtol(argv[1], NULL, 10);
 
     // Let the nodes get init
-    sleep(2);
+    sleep(1);
 
     //Create a node
     Controller controller(arg);
@@ -172,7 +183,7 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < controller.duration; i++)
     {
         if (i % 30 == 0)
-            controller.readFile();
+            controller.helloProtocol();
 
         sleep(1);
     }
