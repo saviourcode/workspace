@@ -79,14 +79,33 @@ void Node::setChannels()
     channel.outputFileName = string("output_") + char('0' + ID);
     channel.receivedFileName = char('0' + ID) + string("_received");
 
+    channel.input.open(channel.inputFileName.c_str(), ios::out);
+    channel.input.close();
+    
     channel.input.open(channel.inputFileName.c_str(), ios::in);
     channel.output.open(channel.outputFileName.c_str(), ios::out | ios::app);
     channel.receivedData.open(channel.receivedFileName.c_str(), ios::out | ios::app);
+
+    if(channel.input.fail())
+    {
+        cout << "Node " << ID << ": No input file" << endl;
+        exit(1);
+    }
+    if(channel.output.fail())
+    {
+        cout << "Node " << ID << ": No output file" << endl;
+        exit(1);
+    }
+    if(channel.receivedData.fail())
+    {
+        cout << "Node " << ID << ": No receivedData file" << endl;
+        exit(1);
+    }
 }
 
 void Node::sendHello()
 {
-    channel.output << "Hello " << ID++ << endl;
+    channel.output << "Hello " << ID << endl;
     channel.output.flush();
 }
 
@@ -131,7 +150,7 @@ int main(int argc, char *argv[])
         sleep(1);
     }
 
-    cout << "Node Done" << endl;
+    cout << "Node " << node.ID << " Done" << endl;
 
     return 0;
 }

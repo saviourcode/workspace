@@ -34,10 +34,32 @@ public:
 
 void NodeRecord::createChannels()
 {
-    
+    channels = new FileDescriptor[numNodes];
+
+    for (size_t i = 0; i < numNodes; i++)
+    {
+        // Give a name to the files
+        channels[i].inputFileName = string("output_") + char('0' + i);
+        channels[i].outputFileName = string("input_") + char('0' + i);
+
+        // Create the files
+        channels[i].input.open(channels[i].inputFileName.c_str(), ios::in);
+        channels[i].output.open(channels[i].outputFileName.c_str(), ios::out | ios::app);
+
+        if(channels[i].input.fail())
+        {
+            cout << "Controller: Node " << i << " No input file" << endl;
+            exit(1);
+        }
+        if(channels[i].output.fail())
+        {
+            cout << "Controller: Node " << i << " No output file" << endl;
+            exit(1);
+        }
+    }
 }
 
-    class Controller
+class Controller
 {
 public:
     Controller(size_t duration) : duration(duration)
@@ -76,7 +98,7 @@ void Controller::parseString(string line) //Waring: Single Sequencial Digit Pars
     char c1 = line[0];
     char c2 = line[2];
 
-    if ((c1 - '0') + 1 > nodes.numNodes || (c2 - '0') + 1 > nodes.numNodes)
+    if (unsigned(c1 - '0') + 1 > nodes.numNodes || unsigned(c2 - '0') + 1 > nodes.numNodes)
     {
         if ((c1 - '0') > (c2 - '0'))
             nodes.numNodes = c1 - '0' + 1;
@@ -87,10 +109,6 @@ void Controller::parseString(string line) //Waring: Single Sequencial Digit Pars
 
 void Controller::createNodeChannels()
 {
-    //Create the Input channel
-    // channel.input.open(channel.inputFileName.c_str(), ofstream::out);
-    // channel.input.close();
-
     // Check and Parse the topology file
     string line;
     while (getline(channel.input, line) && !channel.input.eof())
@@ -144,11 +162,11 @@ int main(int argc, char *argv[])
     //Convert Char Array to long int
     long int arg = strtol(argv[1], NULL, 10);
 
+    // Let the nodes get init
+    sleep(2);
+
     //Create a node
     Controller controller(arg);
-
-    // Let the nodes get init
-    sleep(1);
 
     // Start the algo
     for (size_t i = 0; i < controller.duration; i++)
