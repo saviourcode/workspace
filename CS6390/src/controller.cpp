@@ -1,25 +1,49 @@
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 using namespace std;
 
 struct FileDescriptor
 {
     // Store the name of the file
-    //string inputFileName;
     string inputFileName;
+    string outputFileName;
 
     // File Descriptors
-    //ofstream input;
     fstream input;
+    ofstream output;
 };
 
-class Controller
+class NodeRecord
+{
+public:
+    NodeRecord(){};
+    ~NodeRecord(){};
+
+    // Total number of nodes
+    size_t numNodes = 0;
+
+    // Channels of Controller
+    FileDescriptor *channels;
+
+    // Create the channels
+    void createChannels();
+};
+
+void NodeRecord::createChannels()
+{
+    
+}
+
+    class Controller
 {
 public:
     Controller(size_t duration) : duration(duration)
     {
-        setChannels();
+        setChannel();
+        createNodeChannels();
     };
     ~Controller(){};
 
@@ -27,24 +51,64 @@ public:
     size_t duration;
 
     // Read File
-    void readFile();
+    string readFile();
 
 private:
     // Channels of Controller
     FileDescriptor channel;
 
+    // Node Record Entries
+    NodeRecord nodes;
+
     // Init Channels
-    void setChannels();
+    void setChannel();
+
+    //Create New Channels
+    void createNodeChannels();
+
+    //Parse the strings
+    void parseString(string);
 };
 
-void Controller::setChannels()
+void Controller::parseString(string line) //Waring: Single Sequencial Digit Parser only!!
 {
-    channel.inputFileName = string("output_0");
+    // Store the characters
+    char c1 = line[0];
+    char c2 = line[2];
 
+    if ((c1 - '0') + 1 > nodes.numNodes || (c2 - '0') + 1 > nodes.numNodes)
+    {
+        if ((c1 - '0') > (c2 - '0'))
+            nodes.numNodes = c1 - '0' + 1;
+        else
+            nodes.numNodes = c2 - '0' + 1;
+    }
+}
+
+void Controller::createNodeChannels()
+{
     //Create the Input channel
-    channel.input.open(channel.inputFileName.c_str(), ofstream::out | ofstream::app);
-    channel.input.close();
+    // channel.input.open(channel.inputFileName.c_str(), ofstream::out);
+    // channel.input.close();
 
+    // Check and Parse the topology file
+    string line;
+    while (getline(channel.input, line) && !channel.input.eof())
+    {
+        parseString(line);
+    }
+
+    // Create the Channels
+    nodes.createChannels();
+}
+
+void Controller::setChannel()
+{
+    // Store the name of the file to open
+    channel.inputFileName = string("topology");
+    channel.outputFileName = "";
+
+    // Open the file as input
     channel.input.open(channel.inputFileName.c_str(), ios::in);
     if (channel.input.fail())
     {
@@ -53,13 +117,18 @@ void Controller::setChannels()
     }
 }
 
-void Controller::readFile()
+string Controller::readFile()
 {
-    channel.input.clear();
-    string line = " nothing";
-    getline(channel.input,line);
-    cout << "Bad:" << channel.input.bad() << " EOF:" << channel.input.eof() << " Fail:" << channel.input.fail() << " GOOD:"<< channel.input.good();
+    string line = "";
+    getline(channel.input, line);
+    if (channel.input.eof())
+    {
+        channel.input.clear();
+        line = "";
+    }
+    //cout << "Bad:" << channel.input.bad() << " EOF:" << channel.input.eof() << " Fail:" << channel.input.fail() << " GOOD:"<< channel.input.good();
     cout << line << endl;
+    return line;
 }
 
 int main(int argc, char *argv[])
@@ -77,10 +146,15 @@ int main(int argc, char *argv[])
 
     //Create a node
     Controller controller(arg);
-    cout << endl;
+
+    // Let the nodes get init
+    sleep(1);
+
+    // Start the algo
     for (size_t i = 0; i < controller.duration; i++)
     {
-        controller.readFile();
+        if (i % 30 == 0)
+            controller.readFile();
 
         sleep(1);
     }

@@ -79,13 +79,9 @@ void Node::setChannels()
     channel.outputFileName = string("output_") + char('0' + ID);
     channel.receivedFileName = char('0' + ID) + string("_received");
 
-    //Create the Input channel
-    channel.input.open(channel.inputFileName.c_str(), ofstream::out);
-    channel.input.close();
-
-    channel.input.open(channel.inputFileName.c_str(), ifstream::in);
-    channel.output.open(channel.outputFileName.c_str(), ofstream::out | ofstream::app);
-    channel.receivedData.open(channel.receivedFileName.c_str(), ofstream::out | ofstream::app);
+    channel.input.open(channel.inputFileName.c_str(), ios::in);
+    channel.output.open(channel.outputFileName.c_str(), ios::out | ios::app);
+    channel.receivedData.open(channel.receivedFileName.c_str(), ios::out | ios::app);
 }
 
 void Node::sendHello()
@@ -122,7 +118,7 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < node.duration; i++)
     {
         // Send Hello Message every 30 seconds
-        if (i % 2 == 0)
+        if (i % 30 == 0)
             node.sendHello();
             
         // Send In tree message every 10 seconds

@@ -4,5 +4,7 @@ rm -rf scenario_1
 mkdir -p scenario_1
 make
 cd ./scenario_1
+touch topology
+echo -e "0 1\n1 2\n2 0" >> topology
 ../bin/controller.out 10 &
 ../bin/node.out 0 10 -1 &

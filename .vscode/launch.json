@@ -10,9 +10,7 @@
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
             "args": [
-                "0",
-                "10",
-                "-1"
+                "2"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
