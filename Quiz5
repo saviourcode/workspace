@@ -1,0 +1,19 @@
+Q1.
+When the entire array is passed to a function the array decays to pointers (Call by reference). But when a single element is passed, the compiler creates a copy (Call by value).
+
+Q3.
+Median is the middle element of an ordered elements.
+
+Q7.
+Pointers point to a variable and only store the address of the variable they are pointing to. They can't be used to directly reference a value, that's why need to dereference them first by using "*" operator
+
+Q8.
+What if the search key is not present in the array? Won't the binary search terminate ever then? No, if the start pointer crosses the end pointer the binary search stops.
+
+Q10. 
+The compiler needs to know the size of array before the program even starts! That's the prime requirement. Arrays are allocate statically and not dynamically like heap.
+
+Q9.
+NULL terminating character is always added by the compiler. It's the default in C automatically done by the Compiler to mark the end of the string.
+
+The array starts from the index 0. The question was asking about the index of the first element.

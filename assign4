@@ -1,0 +1,205 @@
+Q1.
+Generally (not always), the callee function don't do the printing work, it just computes the data/value and return to the caller function. It's the caller function that will further do the printing work.
+
+Inside the function perfect(int), when we are finding the factors, the condition of the for loop can be changed a bit to make it more efficient.
+Let's see how.
+See, there's a property on factors of a number, such that if we can find all the factors till square root of the number, then we can definitely find all other factor till the number itself.
+For Example, if the number is 25, then it's square root is 5. So, to find all the factor of 25 I will just need to find factors which lies between 2 to 5 range only.
+Once, we know this theorem, we can use it's corollary to find the other factors of the given number by forming pairs as (i, number/i)
+
+Let's see an example, say we want to find all the factors of the number 100.
+First, we will take the square root of 100 which is 10, this will be our upper bound of the loop, instead of the number itself.
+Second, we will find all the factors from 2 to sqrt(num), i.e. from 2 to 10 here.
+Which will give us the pairs by using (i, num/i) as, (2, 50), (4, 25), (5, 20), (10, 10)
+And that's it! We found all the factors of 100 i.e. 2,4,5,10,20,25,50 (ofcourse 1 is also there and we know it's a factor so that's why we don't start from 1, as our for loop here is only used to find other unknown factors)
+As you can see we didn't go past 10 and all the way up to 100 here and hence significantly improved the performance of the program.
+
+A Pseudocode for this thing can be as:
+
+bool perfect(int num)
+{
+    int sum = 0;
+    sum+=1; // 1 is a factor that we already know
+
+    // Finding other unknown factors
+    for(int i=2; i*i <= num; i++)
+    {
+        // if 'i' is the square root of the number then don't find pair because pairs will have same values
+         if(i*i == num)
+        {
+            sum+=i;
+        }
+        // if 'i' is divisible by the number then add it and it's pair to the sum
+        else if(num%i==0)
+        {
+            sum+=i;
+            sum+=(num/i);
+        }
+    }
+    // Check if it's perfect or not
+    return (num==sum) ? true : false;
+}
+
+
+Now, imagine how fast this program will be for very very large numbers! like in the range of millions and billions, because now we are just checking till square root of the number.
+
+Q2.
+
+Nice, you initialized the rand() with srand(time(NULL)) to make it even more random. But Remember whenever you use srand() to initialize the rand() function, always do a dry call to the rand() (Basically skip the first returned value of rand()) something like this,
+
+srand(time(NULL));
+
+rand(); // Ignore this value of rand function
+
+This is done because after using the srand(), the first call to rand() follows a pattern which is mathematically predictable and we don't want that, because random numbers should always be unpredictable.
+
+// Another solution
+
+The indexing of the frequencyCounter array is not properly done. When we were storing it inside the array, the switch shouldn't have skipped some of the index, like 2 and 11.
+
+Additionally, when the program was printing the value of the frequencyCounter in reality it started off at the index 1, but the first value of array, i.e. frequencyCount of value 2 was at index 0.
+
+For in sequential storage and access to and from the array, 2 marks will be deducted
+
+Q3.
+According to the problem statement, the program must print in the values instantly if the number is unique.
+4 marks will be deducted
+
+// Another solution
+Actually, there was no need for using array to store the values from the user, as we are aint doing anything with it apart from just checking how many times have it occured before, which is exactly what the occurenceArray[] does.
+Also, the switch case could have also been avoid as:
+
+int input;
+int occurenceArray[SIZE] = {0};
+
+for(int i = 0; i < SIZE; i++)
+{
+    // For out of bound error handling
+    do
+    {
+        printf("Please enter a number between 0 and 10 inclusive\n"); // prompts the user
+        scanf("%d", &input); // takes in number from user
+
+        if(input >=0 && input <=10)
+        {
+            occurenceArray[input]++;
+            break;
+        }
+        else
+            printf("Out of bound, try again\n");
+    }while(1);
+    
+    // Check for first time or not
+    if(occurenceArray[input] == 1)
+    {
+        printf("The number is: %d\n", input);
+    }
+}
+
+// Another Solution
+
+I understood your solution, but it makes use of magic numbers like 20 and it can become hard to grasp if you come back later on to work on the program after like several months.
+So, to avoid this, you could perhaps have made use of single array as follows:
+
+#include <stdio.h>
+#include <stdbool.h>
+
+int main()
+{
+    // Store the status of the input
+    bool used[10] = {0};
+    int input;
+
+    for(int i = 0; i < 10; i++)
+    {
+        // Take the input from the user
+        do
+        {
+            printf("Please enter a number between 0 and 10 inclusive: ");
+            scanf("%d", &input);
+
+            if(input >=0 && input <= 10)
+            {
+                break;
+            }
+            else
+            {
+                printf("Out-of-bound, try again\n");
+            }
+        }while(1);
+        
+        // Check if the input was previously used or not
+        if(!used[input])
+        {
+            printf("The number is: %d\n",input);
+            used[input] = true;
+        }
+    }
+    
+    return 0;
+}
+
+Q4.
+a) No, there is an error (Never believe in the Compiler, it can't report logical errors). 
+Look carefully, the size of the buffer to store the char array is 5 and our message "hello" is also exactly 5 characters long, so far so good. However, in C, every string is stored with a NULL character ('\0'), hence making our input message 6 characters long. But our buffer size is just 5.
+['h' , 'e', 'l', 'l', 'o', '\0'] <- the input string is stored like this in the memory. Due to the lack of space for our NULL character ('\0'), we will have something know as a Buffer-Overflow, which is a high vulnerability risk for any program. Unlike many other High-Level Languages, C does not support out-of-bound error handling, wherein it could have thrown an exception or error message to the user, telling about this.
+And that's why we have to be particularly more cautious about these things in C. Kindly, refer to a detailed article at http://c-faq.com/stdio/scanfprobs.html explaining about the disadvantages of using scanf().
+
+So, the correct answer to this question was to use a flag to set the limit of the input characters that scanf() can allow to be stored. Which is always one less than the buffer size, which in this case will be 4.
+scanf("%4s",str);
+
+In the same lines, gets() function is even more worse, and many developers around the world are coming together to remove this function forever (deprecation) from the C Standard Library (C Runtime Library).
+The safest option is to use flags like above whenever we are dealing with scanf() and strings.
+
+3 marks will be deducted
+
+b) Array index starts from 0, and not from 1.
+Additionally, the index of 3 is a out-of-bound index, and not possible to have. Again, C Compiler doesn't support the error handling for this (Never believe in the Compiler, it can't report logical errors).
+The only valid index possible here are 0, 1, and 2 because the array size is of 3.
+
+// Another solution
+b) '$' is used instead of '%'
+
+3 marks will be deducted
+
+Q5.
+
+a) No, never do this. Let me explain why, 9999 and -9999 is neither equal to +ve infinity nor -ve infinity. They are just simple numbers on the number line.
+
+Now, let's say, my array contains numbers only between 0 and 100. So, what will be the value stored inside min and max variables?
+
+Still 9999 and -9999, because, no value can replace the contains of those variables.
+
+For such cases, it is always better to pick a number from the array itself at the start, and generally many prefer index 0 because, every array in this world has at least index 0.
+
+so, it should be float min = max =  w[0];
+
+2 marks will be deducted for this
+
+b)
+Array index start from 0, so the element 4 will be at index 3.
+2 marks will be deducted.
+
+c)
+
+int g[5] = {8}; 
+doesn't initializes all the elements to 8. What it actually does is, it initializes only the first element to 8 and the rest to zero. So, it is basically equivalent to {8, 0, 0, 0, 0};
+2 marks will be deducted
+
+Q6.
+a)
+As we generally do with the normal variables like giving them a default values, so in the same lines, the pointer too have there default values i.e. NULL
+So, the proper declaration and defintion of the pointer will be:
+
+long int *lptr = NULL;
+
+Giving them a default value makes them even more safe to work with, like passing to it some other function, which can then check if it carries a legitimate variables address or it's empty/NULL and shouldn't try to dereference it.
+
+No marks will be deducted for this issue.
+
+
+f) To print address "%p" is used.
+
+2 marks will be deducted
+
+Kindly, use "%p" to print the address, because it is implementation defined. Other format specifier like %x or %u might cause Undefined Behaviour
