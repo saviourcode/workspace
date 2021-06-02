@@ -68,3 +68,20 @@ Eg.
 2. When adding a string literal or a character literal atleast one of the operand must be a string type.
 `string s7 = ("hello" + ", ") + s2; // Err: can't add string literals`
 3. For historical reasons and for compatibility with C, string literals are not standard library `string`s.
+### Character Operations, Range based For-Loop
+1. `range-for` is used to process every character in the string.
+2. Syntax is as follows:
+```cpp
+for(declaration : expression)
+    statement
+```
+where `expression` is an object of a type that represents a sequence, and `declaration` defines the variable that we'll use to access the underlying elements in the sequence.  
+
+3. On each iteration, the variable in the declaration is initialized from the value of the next element in expression.
+### Processing Only some Characters
+1. The `string` class provide us with the `[]` operator, also known as subscript operator.
+2. It takes the input as `string::size_type`
+3. The value of subscript of a string is `>=0` or `< size()`
+4. The result of using an index outside this range is undefined. So, using subscripting to an empty string is undefined.
+
+# Library `Vector` Type
