@@ -170,3 +170,12 @@ vector::size_type // error
 ```
 3. The subscript operator on `vector` (and `string`) fetches an existing element; it does not add an element.
 4. A good way to ensure that subscripts are in range is to avoid subscripting altogether by using a `range for` whenever possible.
+
+## Iterators
+1. Like pointers, iterators give us indirect access to an object.
+2. In the case of an iterator, that object is an element in a container or a character in a `string`.
+3. A valid iterator either denotes a n element or denotes a position one past the last element in a container. All other iterator values are invalid.
+
+### Using Iterators
+1. The `begin` memeber returns an iterator that denotes the first element (or first character).
+2. The iterator returned by `end` is an iterator positioned "one past the end" of the associated container.
