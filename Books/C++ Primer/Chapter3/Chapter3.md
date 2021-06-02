@@ -85,3 +85,17 @@ where `expression` is an object of a type that represents a sequence, and `decla
 4. The result of using an index outside this range is undefined. So, using subscripting to an empty string is undefined.
 
 # Library `Vector` Type
+1. `vector` is a collection of objects, all of which have the same type.
+2. It is also referred to as a container because it "contains" other objects.
+3. It is defined in the `vector` standard library of C++
+4. `vector` is a class template. C++ has both class and function templates.
+5. The process that the compiler uses to create classes or function from templates is called **instantiation**.
+6. We specify the type of the object to the `vector` to create our template.
+Eg.
+```cpp
+vector<int> ivec; // ivec holds objects of type int
+vector<Sales_item> Sales_vec; // holds Sales_items
+vector<vector<string>> file; // vector whose elements are vectors
+```
+7. Since reference are not objects, so we can't have vector of references.
+## Defining and initializing a `vector`
