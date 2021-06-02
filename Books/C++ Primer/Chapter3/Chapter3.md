@@ -99,3 +99,43 @@ vector<vector<string>> file; // vector whose elements are vectors
 ```
 7. Since reference are not objects, so we can't have vector of references.
 ## Defining and initializing a `vector`
+1. Various methods to intialize a `vector` are:
+```cpp
+vectior<T> v1; // vector holds object of type T. Default initialization, empty
+vector<T> v2(v1); // v2 has a copy of v1, direct initialization form
+vector<T> v2 = v1; // Equivalent to above, copy initialization form
+vector<T> v3(n, val); // v3 has n elements with value val
+vector<T> v4(n); // v4 has n copies of value-initialized object.
+vector<T> v5{a,b,c,...}; //Direct form and elements are initialized by corresponding initializers
+vector<T> v5 = {a,b,c,...}; // same as above but now copy initialization
+### List initialization 
+```cpp
+vector<string> v1{"a","b","c",...}; // List initialization
+vector<string> v2("a","b","c",...); // error
+```
+### Direct and Copy form
+Use direct form only when passing the count of the `vector`
+```cpp
+vector<int> vi(10); // ok, 10 elements
+vector<int> vi = 10; //Err
+```
+### List initializer or Element Count?
+1. Whenever there is a confusion between List initialization and element count follow the below steps:   
+    1. For data type apart from `string`, if we use parentheses, then we are asking for the count and the value to initialized as
+    ```cpp
+    vector<int> v1(10); // 10 elements, default initialized
+    vector<int> v1(10,1); // 10 elements with value 1
+    ```
+    And if we use curly braces then we are providing specific values to the vector as
+    ```cpp
+    vector<int> v2{10}; // 1 element with value 10
+    vector<int> v2{10,1} // two element, one is 10 and other is 1
+    ```
+    2. For `string` data type however, there is no ambiguity between the parentheses and the curly brace as
+    ```cpp
+    vector<string> v5{"hi"}; // list initialization, one element
+    vector<string> v6("hi"); // Err, can't construct a vector
+    vector<string> v7{10}; // ten elements, default initialized
+    vector<string> v8{10,"hi"}; // ten elements with value hi
+    ```
+## Adding Elements to a `vector`
