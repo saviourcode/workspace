@@ -32,5 +32,10 @@ string s3 = "value"; // equivalent to above
 string s4(n, 'c'); // initialize s4 with n copies of the character 'c'
 ```
 ## Direct and Copy Forms of Initialization
-1. When we use `=` we ask the compiler to copy initialize the object by copying the initializer on the right-hand side into the object being created.
-2. 
+1. When we use `=` we ask the compiler to **copy initialize** the object by copying the initializer on the right-hand side into the object being created.
+2. And when we omit the `=`, we use **direct initialization**.
+3. When we have a single initializer, we have a choice between Copy initialize or Direct Initialize.
+4. But when we have more than one value in the initializer then we must use Direct Initialization. Eg. incase of s4.
+5. If we still want to use copy initialization then we must do so by doing it indirectly (Indirect copy initialization).
+Eg.
+`string s8 = string(10, 'c'); // indirect copy initialization`
