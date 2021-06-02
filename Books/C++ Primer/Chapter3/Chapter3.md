@@ -139,3 +139,34 @@ vector<int> vi = 10; //Err
     vector<string> v8{10,"hi"}; // ten elements with value hi
     ```
 ## Adding Elements to a `vector`
+1. To add an element to the `vector` use, `push_back` method at runtime.
+```cpp
+vector<int> v1; //Default initialized, empty
+
+for(int i = 0; i != 100; ++i)
+    v1.push_back(i); // append to the back of v1
+```
+2. `vector` generally follow the grow concept, because they can be grown easily. So, don't define `vector` of a particular size, just add elements to it by `push_back` method.
+### Programming implications of adding elements to a `vector`
+1. The loops must be correctly written even when the size of the `vector` changes.
+2. The body of `range-for` must not change the size of the sequence over which it is iterating.
+## Other `vector` Operations
+1. There are various operations that can be performed on `vector`s such as:
+```cpp
+v.empty(); // Returns if v is empty, otherwise returns false
+v.size(); // Returns the number of elements in v
+v.push_back(t); // Adds an element with value t to the end of v
+v[n]; // Returns a reference to the element at position n in v
+v1 = v2; // Create a copy of v2 in v1
+v1 = {a,b,c,...}; // List initialization
+v1 == v2; // Check if both the vectors are same or not
+v1 != v2; // Same as above
+<,<=,>,>=; // Have their normal meaning using dictionary ordering
+```
+2. To use `size_type`, we must name the type in which it is defined. A `vector` type always includes its element type.
+```cpp
+vector<int>::size_type // ok
+vector::size_type // error
+```
+3. The subscript operator on `vector` (and `string`) fetches an existing element; it does not add an element.
+4. A good way to ensure that subscripts are in range is to avoid subscripting altogether by using a `range for` whenever possible.
