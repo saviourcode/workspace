@@ -39,3 +39,32 @@ string s4(n, 'c'); // initialize s4 with n copies of the character 'c'
 5. If we still want to use copy initialization then we must do so by doing it indirectly (Indirect copy initialization).
 Eg.
 `string s8 = string(10, 'c'); // indirect copy initialization`
+## Operations on `string`s
+```cpp
+os << s; // Write s onto output stream os. Returns os.
+is >> s; // Reads whitespace-seperated string from is into s. Returns is.
+getline(is,s); // Reads a line of input from is into s. Returns is.
+s.empty(); // Return true is empty else false
+s.size(); // Returns the number of characters in s
+s[n]; // Returns a reference to the char at pointion n in s
+s1 + s2; // Returns a string by concatenation
+s1 = s2; // Replaces characters in s1 with a copy of s2
+s1 == s2; // Check for equality
+s1 != s2; // same as above
+<,<=,>,>=; // Compare according to dictionary ordering
+```
+### Reading and Writing `string`
+1. The `string` input operator reads and discards any leading whitespace (e.g., spaces, newlines, tabs). It just reads characters until the next whitespace character is encountered.
+2. `getline()` function is used to read the entire line instead of `>>` operator.
+3. Because both these methods returns the input stream, we can use them as a condition inside the while loop, which will check their state.
+### `string::size_type` Type
+1. The `string` class-and most other library types-defines several companion types. These companion types make it possible to use the library types in a machine-independent manner.
+2. `size_type` is one of those types.
+3. We can ask the compiler to a make a variable of type `size_type` by using `decltype` or `auto`
+Eg.
+`auto len = line.size(); // len has type string::size_type`
+### Adding the `string`
+1. Adding two strings is pretty strightforward just use `+` or `+=` operator
+2. When adding a string literal or a character literal atleast one of the operand must be a string type.
+`string s7 = ("hello" + ", ") + s2; // Err: can't add string literals`
+3. For historical reasons and for compatibility with C, string literals are not standard library `string`s.
