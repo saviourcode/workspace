@@ -179,3 +179,91 @@ vector::size_type // error
 ### Using Iterators
 1. The `begin` memeber returns an iterator that denotes the first element (or first character).
 2. The iterator returned by `end` is an iterator positioned "one past the end" of the associated container.
+3. The iterator returned by the end is often referred to as the **off-the-end iterator**.
+4. If the container is empty, beign returns the same iterator as the one returned by end.
+5. And we never really care about the precise type that an iterator has. So, we simply define them as `auto`.
+`auto b = v.begin(), e = v.end();`
+### Iterator Operations
+1. Various Operations on iterator are as follows:
+```cpp
+*iter // Returns a reference to the element denoted by the iterator iter
+iter->mem // It is used for class-types. Like string have empty() Dereferences iter and fetches the member named mem from the underlying element. Equivalent to (*iter).mem
+++iter // Increments iter to refer to the next element in the container
+--iter // Decrements iter to refer to the previous element in the container
+iter1 == iter2 // Compares if they are equal
+iter1 != iter2 // Check if they are unequal
+```
+2. Dereferencing an invalid iterator is an Undefined Behaviour
+### Moving Iterators from one element to another
+1. By incrementing a iterator we advance the iterator by one position.
+2. **Important Note**: The iterator returned from `end` does not denote an element, it may not be incremented or dereferenced.
+
+> C++ Programmers tend to use `!=` rather than `<` because of the habit of using iterators. As many libraries don't even provide subscript operator.
+### Iterator Types
+1. The Library type that have iterators define types named `iterator` and `const_iterator` that represent actual iterator types
+```cpp
+vector<int>::iterator it; // it can read and write the vector elements
+string::iterator it2; // it2 can read and write in a string
+vector<int>::const_iterator it3; // it3 can read but not write elements
+string::const_iterator it4; // it4 can read but not write elements
+```
+2. `const_iterator` behaves exactly like a pointer to `const`.
+3. If a `vector` or `string` is `const`, we may use only its `const_iterator` type. And with non`const` `vector` or `string` we can use either `iterator` or `const_iterator`.
+### The `begin` and `end` Operations
+1. If the object is `const`, then `begin` and `end` return a `const_iterator`; if the object is not `const`, they return `iterator`
+```cpp
+vector<int> v; // Default initialization form
+const vector<int> cv;
+auto it1 = v.begin(); // it1 has type vector<int>::iterator
+auto it2 = cv.begin(); // it2 has type vector<int>::const_iterator
+```
+So, the new standard introduced two new functions named `cbegin()` and `cend()`
+`auto it3 = v.cbegin();` it3 has type vector<int>::const_iterator
+### Deferencing a Member type from the iterator
+1. 
+```cpp
+vector<string> s;
+auto it = s.begin();
+
+(*it).empty(); // To check if the first element is empty or not
+it->empty(); // Same as above
+```
+What the parentheses does is that they first dereference the iterator and then it access the member function.
+### Some `vector` Operations invalidate iterator
+Any operation of adding new element to the `vector` like `push_back` will invalidate the iterators into that `vector`
+
+## Iterator Arthimetic
+> Whatever arithmetic operation you do, just remember that the iterator needs to denote the elements in, or one past the end of, the same container.
+1. Iterators for `string` and `vector` support additional operations that can move and iterator multiple elements at a time. They also support all the relational operators. And these are referred as **iterator arithmetic**
+2. iter + n or iter - n or iter += n or iter -= n, moves the iterator by that such integral value.
+3. iter1 - iter2, yields the signed difference between the two.
+4. `>,>=,<,<=` relational operations are also permitted.
+### Arithmetic Operations on Iterators
+1. We can compute an iterator to the element nearest the middle of a vector as:
+`auto mid = vi.begin() + vi.size() / 2;`
+2. When we subtract two iterator we get a signed integral type named as `difference_type`. It is defined by the library container.
+### Using Iterator Arithmetic
+```cpp
+auto sought = "some string" // string to find
+const vector<string> s; // Default initialization form
+// Later I add some elements at runtime using push_back
+// And then I even somehow sort then
+auto start = s.begin(); // begin iterator
+auto end = s.end(); // end iterator
+auto mid = start + (end - start)/2; // Midpoint
+
+while(mid != end && *mid != sought)
+{
+    if(sought < mid) // Check only the first half
+        end = mid
+    else // or else check the other half
+        start = mid + 1;
+    
+    mid = start + (end - start)/2 // new midpoint
+}
+
+// read out the mid variable the answer is stored inside it
+```
+
+
+
