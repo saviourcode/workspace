@@ -264,6 +264,167 @@ while(mid != end && *mid != sought)
 
 // read out the mid variable the answer is stored inside it
 ```
+## Array
+### Defining and Initializing Built-in Arrays
+1. The size that is passed to the array for dimensions has to be a `constexpr` (Constant Expression) such as:
+```cpp
+constexpr unsigned sz = 42; // Constant Expression
 
+int arr[sz]; // array of 42 elements
+string strs[get_size()]; // Ok if get_size() returns a constexpr
+```
+> As with variables of built-in type, a default-initialized array of built-in type that is defined inside a function will have always have undefined values.
+2. There can't be array of reference because array stores objects.
+3. When we define an array we can't use `auto` to deduce the type of the array from the list initialization
+4. When we initialize an array with a string the NULL character is also added to the array as:
+```cpp
+char c = "C++"; // NULL terminatior added automatically
+```
+5. Arrays don't support copy or assignment operators
+### Understand Complicated Array Declarations
+**Important Topic**
+1. Always read the arrays starting from the name of the declaration to inside-out.
+Eg.
+```cpp
+int *ptrs[10]; // ptrs is an array of 10 pointers to int
+int &refs[10] = /* ? */; // No valid
+int (*Parray)[10] = &arr; // Parray is pointer to an array of 10 ints
+int (&Rarray)[10] = arr; // Rarray is a reference to array of 10 ints
+int *(&Rarray)[10] = ptrs; // Rarray is a reference to array of 10 pointers to int
+```
+### Accessing the element in the array
+1. Array uses the index which is of type `size_t` and defined in `cstddef` header
+2. We can use `range-for` when we have to traverse the entire array
+```cpp
+unsigned scores[11] = {};
+// And then fill the array by taking input from the user
+for(auto i:scores)
+    cout << i << " ";
 
+cout << endl;
+```
+### Pointers and Array
+1. Operation on arrays are actually really like operation on pointers
+```cpp
+int ia[] = {0,1,2,3,4,5}; // ia is an array of 10 ints
+auto ia2(ia); // ia2 is an int* that points to the first element in ia
+```
+2. However when we use decltype the conversion happens in a bit odd way
+```cpp
+decltype(ia) ia3 = {0,1,2,3,4,5};
+```
+here ia3 is actually an array of 6 ints.
+### Library function `begin` and `end`
+1. The standard included two new functions `begin` and `end`
+2. Since the array is not a class type, so these functions can't be a member of the array.
+3. The array needs to be passed to the function `begin` and `end`.
+```cpp
+int ia = {0,1,2,3,4,5,6};
+int *beg = begin(ia); // Pointer to the first element in ia
+int *last = end(ia); // Pointer to one past the last element in ia
+```
+These functions are defined in `iterator` header.
+### Pointer Arthimetic
+1. The Subtraction of two pointers yields a library type named as `ptrdiff_t`. And like `size_t`, the `ptrdiff_t` type is machine-specific type and is defined in the `cstddef` header.
+2. `ptrdiff_t` is a signed integral type.
+### Subscripts and Pointers
+1. The built-in subscript can be a negative index.
+```cpp
+int *p = &ia[2]; // p points to the element indexed by 2
+int j = p[1];   // p[1] is equivalent to *(p+1)
+                // p[1] is the same element as ia[3]
+int k = p[-2]; // p[-2] is the same element as ia[0]
+```
+> Unlike subscripts for `vector` and `string`, the index of built-in subscript operator is not an `unsigned` type.
+### C-Style Character String
+> Please avoid using them in the code, they can cause vulnerbility issue and introduce bugs in the code.
+### Interfacing to Older code
+1. To convert a string to C-Style string use:
+```cpp
+string s("some string"); // Direct Form of initialization
 
+char *str = s; // Err
+const char *str = s.c_str(); //Ok
+```
+`c_str()` method returns a const char pointer
+2. To convert a array to a vector
+```cpp
+int arr[] = {0,1,2,3,4,5};
+
+vector<int> ivec(begin(arr), end(arr)); // Complete array
+vector<int> subvec(arr + 1, arr + 4); // Only a sub-array
+```
+
+All other combinations are not possible, like initializing a array from a vector.
+
+> Prefer to use Library types instead of arrays and pointer because they are error-prone
+
+## Multidimensional arrays
+1. There are no multidimensional array. 
+2. There is actually only array of arrays.
+Eg.
+```cpp
+int ia[3][4]; // array of size 3; each element is an array of ints of size 4
+int arr[10][20][30] = {0}; // array of size 10; each element is a 20-element array whose elements are arrays of 30 ints
+```
+### Initializing the elements of a Multidimensional Array
+1. We can initialize the elements of a multidimensional array by providing a bracketed list of initializers.
+2. The bracketed values for each row is as follows:
+```cpp
+int ia[3][4] = { // three elements, each element is an array of size 4
+    {0, 1, 2, 3}, // index 0
+    {4, 5, 6, 7}, // index 1
+    {8, 9, 10 ,11} // index 2
+};
+```
+We can omit the brackets for this particular case, but the readibility decreases greatly.
+
+3. But for a incomplete initializer the brackets makes a difference as,
+```cpp
+int ia[3][4] = {{0}, {4}, {8}}; // explicitly initialize only the element 0 in each row
+int ix[3][4] = {0, 3, 6, 9}; // explicitly initializes only the first row and not the other ones.
+```
+### Subscripting a Multidimensional Array
+1. We can use nested for loops
+### Using a `range for` with multidimensional arrays
+1. We can use `range-for` in our example as:
+```cpp
+for(auto &row : ia) // for every element in the outer array
+    for(auto &col : row) // for every element in the inner array
+        cout << col << endl;
+```
+And if we want to write the above code without using the reference then we must make the outer loop a reference.
+```cpp
+for(const auto &row : ia)
+    for(auto col : row)
+        /* do something */
+```
+We have done so to avoid normal array to pointer conversion.
+If it had been written like this:
+```cpp
+for(auto row : ia)
+    for(auto col : row)
+```
+Then the compiler would have initialized `row` as `int *`, due to which the inner loop would have become illegal. As, how come `col` be made mapped to the original element in the array. There is no way of doing that.
+
+> To use a multidimensional array in a `range-for` the loop control variable except for the inner most array must be references.
+
+### Pointers and Multidimensional Arrays
+> Whenever we define a pointer to a multidimensional array, we are just defining it to array of arrays.
+
+```cpp
+int ia[3][4]; // ia is an array of size 3, and each element is array of size 4 of ints
+int (*p)[4] = ia; // p points to an array of four ints
+p = &ia[2]; // p now points to the last element in ia
+
+int *q = *p; // first element in the last row of ia
+// Ofcourse we can use begin() and end() as
+p = begin(ia); // First row
+q = begin(*p); // First element of the First row
+
+// Also we can even use typedef and using as
+using int_four_arr = int[4]; // New style
+typedef int int_four_arr[4]; // Equivalent typedef
+// And now
+int_four_arr *p = ia; // Now remember to first read from right to left. P is a pointer to int_four_arr -> pointer to array of four ints
+```
