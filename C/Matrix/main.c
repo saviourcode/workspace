@@ -5,7 +5,7 @@
 #include "ui.h"
 #include "matrix.h"
 
-#define ITERATIONS 300
+#define ITERATIONS 30000
 #define REFRESH_DELAY 50000L
 
 int main(int argc, char **argv) {

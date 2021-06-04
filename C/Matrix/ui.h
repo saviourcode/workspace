@@ -8,7 +8,8 @@
 #define MAX_INTENSITY 13
 #define MIN_INTENSITY 4
 
-typedef struct {
+typedef struct
+{
     char char_value;
     int intensity;
 } cell;
