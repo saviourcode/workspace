@@ -44,18 +44,18 @@ void matrix_init() {
     }
 
     //init drips
-    init_drips():
+    init_drips();
 }
 
 void fade_n_change_matrix(){
     for(int x=0; x < MAXX; x++){
         for(int y=0; y<MAXY; y++){
             // randomly change characters -- even the invisible ones
-            if(rand01 < PROB_CHANGE || matrix[x][y].char_value==0){
+            if(rand01() < PROB_CHANGE || matrix[x][y].char_value==0){
                 matrix[x][y].char_value = RANDON_PRINTABLE_CHARACTER;
             }
             // randomly dim the cells
-            if(rand01 < PROB_DIM){
+            if(rand01() < PROB_DIM){
                 if(matrix[x][y].intensity>0)
                     matrix[x][y].intensity--;
             }
@@ -93,7 +93,7 @@ void update_drips() {
 }
 
 void matrix_update(){
-    if(rand01 < PROB_SPAWN){
+    if(rand01() < PROB_SPAWN){
         try_add_drips();
     }
     update_drips();
