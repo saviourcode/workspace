@@ -33,3 +33,17 @@ const char *pc;
 char *p = const_cast<char*>(pc); // ok
 ```
 2. It converts a `const` object to a non `const` type "casts away the `const`." However, using a `const_cast` in order to write to a `const` object is undefined.
+3. Don't mix the functionality of `const_cast` with any other named cast. Only `const_cast` can change the constness of an expression.
+### `reinterpret_cast`
+1. It generally performs a low-level reinterpretation of the bit pattern of its operands.
+Eg.
+```cpp
+int *ip;
+char *pc = reinterpret_cast<char*>(ip);
+```
+2. It can further down the line result in bizarre run-time behavior. Such as: `string str(pc);`, as the internal pc is still pointing to an `int` type, and even worse is that the compiler will never give any warning.
+3. This cast is machine-dependent.
+
+> General advice is not avoid casts as much as possible
+
+
