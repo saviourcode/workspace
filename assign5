@@ -1,2 +1,0 @@
-Q3.
-Though Arrays are similar to pointers, they ain't totally same. They both become same only when a array is passed to a function, in which case the array decays to a pointer.
