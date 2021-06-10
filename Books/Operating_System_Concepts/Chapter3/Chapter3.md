@@ -116,5 +116,51 @@ The processes in most systems can execute concurrently, and they may be created 
 
 ## Process Creation
 1. A process that creates more processes of it's own becomes the parent process and the process it created becomes child processes. Also, each of these child processes may in turn create other processes, forming a `tree` of processes.
-2. Most OS assign a `Process Identifier` or (PID) to each process.
-3. 
+2. Most OS assign a `Process Identifier` or (PID) to each process. Which is used as an index to access various attributes of a process within the kernel.
+3. For the Linux OS, the `systemd` task (yes, linux uses name task instead of process) serves as the root parent process for all user processes, and is the first user process created when the system boots.
+
+![Process Tree](./Process_tree.PNG)
+
+4. In general, when a process creates a child process, that child process will need certain resources (CPU time, memory files, I/O devices) to accomplish its task.
+5. A child process can either ask the resources from the OS or it can ask from it's parent process.
+6. If it ask from the parent process then, the parent may have to partition its resources among its children, or it may have to share some resources among several of its children.
+7. The above method, that is restricting a child process to a subset of parent's resources prevents any process from overloading the system by creating too many child processes.
+8. Parent process may in some case have to pass some initialization data (input) to the child process.
+9. When a process creates a new process, two possibilities for execution exist:
+    1. The parent continues to execute concurrently with its children.
+    2. The parent waits until some or all of its children have terminated.
+10. There are also two address-space possibilities for the new process:
+    1. The child process is a duplicate of the parent process ( it has the same program and data as the parent)
+    2. The child process has a new program loaded into it.
+11. In UNIX-system a new process is created by `fork()` system call. And the new process consists of a copy of the address space of the original process. This always easy communication between parent and child process.
+12. Both the processes continue execution at the instruction after the fork(), with one difference: the return code for the `fork()` is zero for the new (child) process, whereas the (nonzero) process identifier of the child is returned to the parent.
+13. The child process can either continue executing the same program as was forked from the parent process, or else, it can totally run a different program by executing the `exec()` system call, which essentially destroys the current memory image and loads the binary file of the new program.
+14. The parent can either create more children, or else wait for the children to complete if it has nothing to do by issusing `wait()` system call.
+## Process Termination
+1. Whenever the process wants to terminates it issues an `exit()` system call and the waiting parent (via `wait()` system call) reads the return status value. After which all the resources are deallocated.
+2. Also, termination of a child process by the parent process is also allowed. A parent may terminate the execution of one of its children for a variety of reasons, such as these:
+    1. The child has exceeded its usage of some of the resources that it has been allocated.
+    2. The task assigned to the child is no longer required
+    3. The parent is exiting, and the operating system does not allow a child to continue if its parent terminates.
+
+3. Some systems use `cascading termination` i.e. is a process terminates then all its children must also be terminated.
+4. A parent process may wait for the termination of a child process by using the `wait()` system call. The `wait()` system call is passed a parameter that allows the parent to obtain the exit status of the child. This system call also returns the process identifier of the terminated child so that the parent can tell which of its children has terminated.
+
+On Child process side
+```c
+...
+/* exit with status 1 */
+exit(1);
+```
+On parent process side
+```c
+pid_t pid;
+int status;
+
+pid = wait(&status);
+```
+5. When a process terminates it's entry is still left in the process table, because it contains the process's exit status.
+6. A process that has terminated, but whose parent has not yet called `wait()` is known as a `zombie` process. All processes transition to this state when they terminate, but generally they exist as zombies only for brief amount of time. Once the parent calls `wait()`, the process identifier of the zombie process and its entry in the process table are released.
+7. If on the other hand if the parent process didn't call `wait()` and instead terminated, thereby leaving its child process as `orphans`. Such processes are adopted by the `systemd` process, and it takes good care of them.
+
+# Interprocess Communication
