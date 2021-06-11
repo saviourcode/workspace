@@ -18,6 +18,17 @@ The benefits of multithreaded programming can be borken down into four major cat
 2. Resource sharing: Processes can share resources only via shared memory or message passing techniques. These things needs to be explicitly arranged by the programmer. However, threads share the memory and the resources of the process to which they belong by default. All the threads of the process runs within the same address space.
 3. Economy: Allocating memory and resources for process creation is costly. Since, threads share the resources of the process to which they belong, it is more economical to create and context-switch threads. Context-switching in threads is typically faster than between processes.
 4. Scalability: The prime benefit of a multithreaded process comes into account when we have multicore system. Because in a multicore system, threads may be running in parallel on different processing cores. A single-threaded process can run on only one processor, regardless how many are available.
+
+> AMDAHL's law   
+> Amdahl's law is a formula that identifies potential performance gains from adding additional computing cores to an appliction that has both serial (non parallel) and parallel components. If S is the portion of the application that must be performed serially on a system with N processing cores, the formula appears as follows:   
+`speedup <= 1/(S+(1-S)/N)`   
+As an example, assume we have an application that is 75% parallel and 25% serial. If we run this application on two cores systemm we can get a speedup of 1.6 times, with four cores it will be 2.28 times.
+
+![Amdahl's Law](./Amdahl.PNG)
+
+> One interesting fact about Amdahl's Law is that as N approaches infinity, the speedup converges to 1/S. For example, if 50% of an application is performed serially, the maximum speedup is 2.0 times, regardless of number of cores.
+This is the fundamental principle behind Amdahl's Law: the serial portion of an application can have a disproportionate effect on the perfomance we gain by adding additional computing cores.
+
 # Multicore Programming
 1. Consider an application with four threads. On a system with a single computing core, concurrency merely means that execution of the threads will be interleaved over time, because the processing core is capable of executing only one thread at a time.
 
@@ -51,7 +62,7 @@ Eg. Two threads might perfrome a unique statistical operation on the array of el
     3. Many to Many - Best of both the world
 # Implicit Threading
 1. As we have seen in earlier sections dividing applications into a thread is really a hectic process, so one way to address these difficulties and better support the design of concurrent and parallel applications is to transfer the creation and management of threading from application developers to compilers and run-time libraries. This strategy is termed as implicit threading.
-2. There are four methods for Implicit Thread
+2. There are five methods for Implicit Threading
 ## Thread Pool
 1. Because if we allow applications to create as many threads as they want then we will run out of system resources easily.
 2. The general idea behind a thread pool is to create a number of threads at start-up and place them into a pool, where they sit and wait for work.
