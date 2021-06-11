@@ -42,3 +42,50 @@ Eg. Summing the contents of an array of size N. It can be divided into multiple 
 3. Task Parallelism: It involves distributing not data but tasks (threads) across multiple computing cores. Each thread is performing a unique operation. Different threads may be operating on the same data, or they may be operating on different data.
 Eg. Two threads might perfrome a unique statistical operation on the array of elements [0] to [N-1].
 4. However, data and task parallelism are not mutually exclusive, and application may use hybrid of these two strategies.
+# Multithreading Models
+1. There are two types of threads based on the level, User threads and kernel threads.
+2. User threads are supported above the kernel and are managed without kernel support, whereas kernel threads are supported and managed directly by the operating system.
+3. A relationship must exist between user threads and kernel threads. And there are three common ways of establishing such relationship:
+    1. Many to One - No parallelism due to one thread blocking
+    2. One to One - Greate parallelism but too many threads can become burden on OS
+    3. Many to Many - Best of both the world
+# Implicit Threading
+1. As we have seen in earlier sections dividing applications into a thread is really a hectic process, so one way to address these difficulties and better support the design of concurrent and parallel applications is to transfer the creation and management of threading from application developers to compilers and run-time libraries. This strategy is termed as implicit threading.
+2. There are four methods for Implicit Thread
+## Thread Pool
+1. Because if we allow applications to create as many threads as they want then we will run out of system resources easily.
+2. The general idea behind a thread pool is to create a number of threads at start-up and place them into a pool, where they sit and wait for work.
+3. Whenever an application submits the request to the thread pool for a new thread. If there is an available thread in the pool, it is awakened, and the request is serviced immediately. If the pool contains no available thread, the task is queued until one becomes free.
+4. Once a thread completes its service, it returns to the pool and awaits more work.
+5. Thread pools work well when the tasks submitted to the pool can be executed asynchronously.
+6. Benefits of Thread Pool are:
+    1. Servicing a request with an existing thread is often faster than waiting to create a thread.
+    2. A thread pool limits the number of threads that exist at any one point.
+    3. Separates the mechanics of creating the task, due to which it can perform task like execute a task after a certain time delay or execute periodically.
+7. The number of threads in the pool can be set heuristically based on number of CPUs, amount of physical memory and the expected number of concurrent client requests. More complex systems can dynamically adjust the number of threads in the pool according to the usage patterns.
+## Fork Join 
+1. It is an synchronous method in which parallel task are designated. 
+2. A library manages the number of threads and is also responisble for assigning tasks to threads.
+
+![Fork Join](./forkjoin.PNG)
+
+## OpenMP
+1. It is a set if compiler directives as well as an API for programs written in C/C++ or FORTRAN that provides support for parallel programming in shared-memory environments.
+2. It identifies parallel regions as blocks of code that may run in parallel.
+3. Application developers insert compiler directives into their code at parallel regions and these directives instruct the OpenMP runtime library to execute the region in parallel.
+## Grand Central Dispatch
+1. GCD is a technology developed by Apple for its macOS and iOS operating systems. It is similar to OpenMP
+## Intel Threading Template Library
+1. It's a C++ library support vast functions for threads.
+# Threading Issues
+## The fork() and exec() System Calls
+1. If one thread in a program calls fork(), does the new process duplicate all threads, or is the new process single-threaded?
+2. Some UNIX systems have two versions of fork(), one that duplicates all threads and another that duplicates only the thread that invoked the fork() system call
+3. If exec() is called immediately after the fork(), then the version of fork() that duplicates all thread is unneccessary. In this instance, duplicating only the calling thread is appropriate.
+## Signal handling
+1. Delivering signals is more complicated in multithreaded programs, where a process may have several threads.
+2. Where, then should a signal be delivered?
+    1. Deliver the signal to the thread to which the signal applies.
+    2. Deliver the signal to every thread in the process
+    3. Deliver the signal to certain threads in the process
+    4. Assign a specific thread to receive all signals for the process.
