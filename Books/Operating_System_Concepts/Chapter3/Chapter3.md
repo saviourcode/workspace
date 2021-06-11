@@ -136,6 +136,9 @@ The processes in most systems can execute concurrently, and they may be created 
 12. Both the processes continue execution at the instruction after the fork(), with one difference: the return code for the `fork()` is zero for the new (child) process, whereas the (nonzero) process identifier of the child is returned to the parent.
 13. The child process can either continue executing the same program as was forked from the parent process, or else, it can totally run a different program by executing the `exec()` system call, which essentially destroys the current memory image and loads the binary file of the new program.
 14. The parent can either create more children, or else wait for the children to complete if it has nothing to do by issusing `wait()` system call.
+
+![FORK](./fork.PNG)
+
 ## Process Termination
 1. Whenever the process wants to terminates it issues an `exit()` system call and the waiting parent (via `wait()` system call) reads the return status value. After which all the resources are deallocated.
 2. Also, termination of a child process by the parent process is also allowed. A parent may terminate the execution of one of its children for a variety of reasons, such as these:
@@ -164,3 +167,157 @@ pid = wait(&status);
 7. If on the other hand if the parent process didn't call `wait()` and instead terminated, thereby leaving its child process as `orphans`. Such processes are adopted by the `systemd` process, and it takes good care of them.
 
 # Interprocess Communication
+1. Any process that shares data with other processes is a cooperating process.
+2. Cooperating processes require an `interprocess communication (IPC)` mechanism that will allow them to exchange data.
+3. There are two fundamental model of IPC:
+    1. Shared Memory - A shared region in memory is used to read and write data.
+    2. Message Passing - Messages are exchanged b/w two cooperating processes.
+
+![Interprocess Communication Model](./IPC.PNG)
+4. Shared Memory IPC is more quick and doesn't require much kernel/ system calls. It is good for large data exchange
+5. Message Passing is used for smaller data but more kernel/system call are required hence making them slower.
+
+# IPC in Shared-Memory Systems
+1. Typically, a shared-memory region resides in the address space of the process creating the shared-memory segment.
+2. Other processes that wish to communicate using this shared-memory segment must attach it to their address space.
+3. Also, the Shared memory assumes that the restriction between accessing a part of other process is also removed for it to work.
+4. It is the duty to the processes to ensure no processes writes simultaneously to the same location.
+5. Let's study an example of producer-consumer process,
+
+let's assume that the following part of the memory/variables are located in the shared memory
+```c
+#define BUFFER_SIZE 10
+
+typedef struct {
+    ...
+} item;
+
+item buffer[BUFFER_SIZE];
+int in = 0;
+int out = 0;
+```
+
+The Code for the Producer Process will be as follows:
+```c
+item next_produced;
+
+while(true) {
+    // produce an item
+    
+    while(((in + 1) % BUFFER_SIZE) == out); // do nothing because buffer is full
+
+    buffer[in] = next_produced;
+    in = (in + 1) % BUFFER_SIZE;
+}
+```
+
+The code for the Consumer Process will be as follows:
+```c
+item next_consumed;
+
+while(true) {
+    while(in == out); // do nothing because the buffer is empty
+
+    next_consumed = buffer[out];
+    out = (out + 1) % BUFFER_SIZE;
+
+    // consume the item
+}
+```
+
+This type of model with these many variables can only store BUFFER_SIZE - 1 items inside it.
+Because of the fact inside the producer, we have used `(in + 1) % BUFFER_SIZE == out` in the while condition.
+It's done because, if had used `in % BUFFER_SIZE == out` instead then there would not be any distinction as to if the buffer is full or empty, both condition would have got same result and hence would have become ambiguous.
+
+By adding `size` variable to our current model we can use `BUFFERSIZE` locations.
+
+# IPC in Message-Passing Systems
+1. Unlike shared-memory model, where the code of the shared memory must be explicitly written by the application programmer, In message-passing we use the services provided by the OS.
+2. It is useful in distributed environment, where the communicating processes may reside on different computers connected by a network.
+3. It provides atleast two operations:
+    1. send(message) and 
+    2. receive(message)
+4. The messages can be fixed or variable in size.
+5. The logical communication link can be of the following type:
+    1. Direct/Indirect Communication
+    2. Synchronous/Asynchronous Communication
+    3. Automatic/Explicit Buffering
+
+## Direct/Indirect Communication
+1. Each process that wants to communicate must explicitly name the recipient or sender of the communication.
+    * send(P, message) - send a message to process P
+    * receive(Q, message) - receive a message from process Q
+2. Between each pair of processes, there exist exactly one link.
+3. The above was the example for the symmetrix addressing where both the process must name each other.
+4. In asymmetric addressing only the sender names the recipient, and the receiver is not required to name the sender as
+    * send(P, message) - Send a message to process P
+    * receiver(id, message) - Receiver a message from any process. The variable id is set to the name of the process with which communication has taken place.
+5. Too much hard coding involved as all the identifiers must be explicitly stated.
+## Indirect Communication
+1. The messages are sent to and received from `mailboxes` or `ports`.
+2. A mailbox can be viewed abstractly as an object onto which messages can be placed by processes and from which messages can be removed.
+3. Each mailbox has a unique identification.
+4. A Process can communicate with another process via a number of different mailboxes.
+5. The operations are defined as follows:
+    * send(A, message) - Send a message to mailbox A.
+    * received(A, message) - Receive a message from mailbox A.
+6. Suppose if the processes P1,P2 and P3 all share mailbox A. Process P1 sends a message to A, while both P2 and P3 execute a receive() from A. Who will read the message depends on the method used:
+    * Allow a link to be associated with two processes at most, so either P2/P3 can join mailbox A in the first place
+    * All at most one process at a time to execute a receive() operation.
+    * Allow system to schedule the receive operation turnwise like round robin.
+7. A mailbox may be owned either by a process or by the operating system. If the mailbox is owned by the process (the mailbox is part of the address space of the process), then we distinguish between the owner (which can receive message throught this mailbox) and the user (which can only send messages to the mailbox). The owners are always unique.
+8. When a process that owns a mailbox terminates, the mailbox disappears. Any process that subsequently sends a message to this mailbox must be notified that mailbox no longer exists now.
+9. Mailbox owned by OS are maintained by the OS and are independent.
+## Synchronization
+1. Message passing may be either blocking or nonblocking
+    * Blocking send - The sending process is blocked until the message is received by the receiving process or by the mailbox.
+    * Nonblocking send - The sending process sends the message and resumes operation
+    * Blocking receive - The receiver blocks until message is available
+    * Nonblocking receive - The receiver retrieves either a valid message or a null.
+2. Different combinations are possible. When both send() and receive() are blocking, we have a rendezvous between the sender and receiver.
+## Buffering
+1. Communication link can even be thought as an queue, and it can be of three types
+    * Zero Capacity: The link cannot have any messages waiting in it. The sender must block until the recipient receives the message.
+    * Bounded Capacity: The queue has finite length n, thus at most n messages can reside in it. If the queue is not full when a new message is sent, the message is placed in the queue, and the sender can continue. If the queue is full then the sender must block untill space is available in the queue.
+    * Unbounded Capacity: The queue has infinite length. The sender never blocks.
+2. The zero-capacity case is sometimes referred to as a message system with no buffering. The other cases are referred to as system with automatic buffering.
+
+# Examples of IPC
+## Pipes
+1. In implementing a pipe, four issues must be considered:
+    * Does the piple allow bidirectional communication or unidirection
+    2. It is half-duplex or full duplex
+    3. Should the communicating process be parent-child
+    4. Can the pipes communicate over a network, or must communicating processes reside on the same machine.
+### Ordinary Pipes
+1. These are unidirection pipe, with one write end and read end.
+2. For bidirectional communication two pipes must be used.
+3. In UNIX pipes are constructed as:
+`pipe(int fd[])`
+This function creates a pipe that is accessed through the int fd[] file descriptors: fd[0] is the read end of the pipe, and fd[1] is the write end. UNIX treats a pipe as a special type of file. Thus, pipes can be accessed using ordinary read() and write() system calls.
+2. Ordinary pipe can only be used by the child processes of the process and not outside of it.
+3. The child process inherits pipes from its parent process, same as other open files from its parent.
+4. If the parent process is sending, it will close the read end and the child process will close the write end before using the pipe.
+
+![Ordinary Pipe](./PIPE.PNG)
+### Named Pipes
+1. They are more powerful communication tool. They can be bidirectional and no parent-child relationship is required.
+2. Once a named pip is established, several processes can use it for communication. They are referred to as FIFOs in UNIX systems. And supports `mkfifo`, `open`, `close`, `read` and `write` system calls.
+# Communication across network
+## Sockets
+1. A socket is identified by an IP address concatenated with a port number.
+2. The server waits for incoming client requests by listening to a specified port. Once a request is received, the server accepts a connection from the client socket to complete the connection.
+3. There are well-known port numbers like SSH (22), HTTP(80), HTTPS(443) they are all below 1024
+4. Each socket is unique in the sense that it is identified by four entities:
+    * Source IP address
+    * Source Port Number
+    * Destination IP address
+    * Destination Port Number
+5. Sockets can be connection-oriented (TCP) or connectionless (UDP).
+## Remote Procedure Calls
+1. The messages exchanged in RPC communication are well strutured and are thus no longer just packets of data.
+2. Each message is addressed to an RPC daemon listening to a port on the remote system, and each contains an identifier specifying the function to execute and the parameters to pass to that function.
+3. The function is then executed as requested and any output is sent back to the requester in a separate message.
+4. Basically, every service here will have some port number to differentiate it from the others.
+5. For instance, if a system wished to allow other systems to be able to list its current users, it would have a daemon supporting such an RPC attached to a port - say, port 3027. Any remote system could obtain the needed information (the list of current users) by sending an RPC message to port 3027 on the server.
+6. In a nutshell, we are calling a function() which is present remotely and passing it some value and reading the returned value from its reply.
