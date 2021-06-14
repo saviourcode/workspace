@@ -14,6 +14,8 @@
 
 int main()
 {
+    /* Take input from the user */
+
     size_t nbytes; // Store number of bytes of string
     ssize_t retnbytes; // Store the value returned from read and write
 
@@ -73,5 +75,14 @@ int main()
     // Get rid of newline
     nbytes = strlen(outputFileName);
     outputFileName[nbytes-1] = '\0';
+
+    /* Open the input and output file */
+    int fd_input, fd_output;
+
+    fd_input = open(inputFileName, O_RDONLY, NULL);
+    if(fd_input == -1)
+    {
+        
+    }
 }
 

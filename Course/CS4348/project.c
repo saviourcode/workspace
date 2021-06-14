@@ -1,8 +1,8 @@
 /* POSIX C API */
-#include <fcntl.h> // open, close files
-#include <unistd.h> // read, write, fork APIs
+#include <fcntl.h>     // open, close files
+#include <unistd.h>    // read, write, fork APIs
 #include <sys/types.h> // ssize_t
-#include <dirent.h> // opendir and readdir
+#include <dirent.h>    // opendir and readdir
 
 /* C Standard library */
 #include <string.h> // string C library functions
@@ -16,15 +16,15 @@
 #define BUFFER_SIZE 100
 #define PATH_NAME 20
 
-void writeFd(int fd, const char* strWrite)
+void writeFd(int fd, const char *strWrite)
 {
-    size_t nbytes; // Store number of bytes of string
+    size_t nbytes;     // Store number of bytes of string
     ssize_t retnbytes; // Store the value returned from read and write
 
     nbytes = strlen(strWrite);
     retnbytes = write(fd, strWrite, nbytes);
 
-    if(retnbytes <= 0)
+    if (retnbytes <= 0)
     {
         char *str = "Write failed!";
         nbytes = strlen(str);
@@ -40,7 +40,7 @@ void readFd(int fd, char *buff, size_t nbytes)
 
     retnbytes = read(fd, buff, nbytes);
 
-    if(retnbytes <= 0)
+    if (retnbytes <= 0)
     {
         char *str = "Read failed!";
         nbytes = strlen(str);
@@ -50,12 +50,12 @@ void readFd(int fd, char *buff, size_t nbytes)
     }
 }
 
-void fileWriter(const char* fileName, int fd)
+void fileWriter(const char *fileName, int fd)
 {
     char buff[BUFFER_SIZE] = {0}; // Critical to zero out or else buffer contains random values
 
     int fileDesc;
-    if((fileDesc = open(fileName, O_RDONLY, NULL)) == -1)
+    if ((fileDesc = open(fileName, O_RDONLY, NULL)) == -1)
     {
         writeFd(STDOUT, "Cannot open file ");
         writeFd(STDOUT, fileName);
@@ -68,23 +68,26 @@ void fileWriter(const char* fileName, int fd)
     writeFd(fd, "EOF\n");
 }
 
-void dirWriter(const char* dirName, int fd)
+void dirWriter(const char *dirName, int fd)
 {
     DIR *dirp;
     struct dirent *dp;
 
-    if((dirp = opendir(dirName)) == NULL) {
+    if ((dirp = opendir(dirName)) == NULL)
+    {
         writeFd(STDOUT, "Opendir Failed\n");
         _exit(EXIT_FAILURE);
     }
 
-    do {
+    do
+    {
         char fileName[PATH_NAME] = {0};
-        strcpy(fileName,dirName);
+        strcpy(fileName, dirName);
 
         errno = 0;
-        if((dp = readdir(dirp)) != NULL){
-            if(strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0)
+        if ((dp = readdir(dirp)) != NULL)
+        {
+            if (strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0)
             {
                 writeFd(fd, dp->d_name);
                 writeFd(fd, "\n");
@@ -92,9 +95,9 @@ void dirWriter(const char* dirName, int fd)
                 fileWriter(fileName, fd);
             }
         }
-    }while(dp != NULL);
+    } while (dp != NULL);
 
-    if(errno != 0)
+    if (errno != 0)
     {
         writeFd(STDOUT, "Readdir Failed\n");
         _exit(EXIT_FAILURE);
