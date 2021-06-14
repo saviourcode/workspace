@@ -52,7 +52,7 @@ void readFd(int fd, char *buff, size_t nbytes)
 
 void fileWriter(const char* fileName, int fd)
 {
-    char buff[BUFFER_SIZE];
+    char buff[BUFFER_SIZE] = {0}; // Critical to zero out or else buffer contains random values
 
     int fileDesc;
     if((fileDesc = open(fileName, O_RDONLY, NULL)) == -1)
@@ -63,9 +63,9 @@ void fileWriter(const char* fileName, int fd)
         _exit(EXIT_FAILURE);
     }
 
-    readFd(fileDesc,buff,BUFFER_SIZE);
+    readFd(fileDesc, buff, BUFFER_SIZE);
     writeFd(fd, buff);
-    //writeFd(fd, "EOF\n");
+    writeFd(fd, "EOF\n");
 }
 
 void dirWriter(const char* dirName, int fd)
@@ -79,7 +79,7 @@ void dirWriter(const char* dirName, int fd)
     }
 
     do {
-        char fileName[PATH_NAME];
+        char fileName[PATH_NAME] = {0};
         strcpy(fileName,dirName);
 
         errno = 0;
@@ -88,7 +88,7 @@ void dirWriter(const char* dirName, int fd)
             {
                 writeFd(fd, dp->d_name);
                 writeFd(fd, "\n");
-                strcat(fileName,dp->d_name);
+                strcat(fileName, dp->d_name);
                 fileWriter(fileName, fd);
             }
         }
