@@ -33,10 +33,38 @@ void writeFd(int fd, const char* strWrite)
     }
 }
 
+void readFd(int fd, char *buff, size_t nbytes)
+{
+    ssize_t retnbytes;
+
+    retnbytes = read(fd, buff, nbytes);
+
+    if(retnbytes <= 0)
+    {
+        char *str = "Read failed!";
+        nbytes = strlen(str);
+        (void)write(STDERR, str, nbytes);
+
+        _exit(EXIT_FAILURE);
+    }
+}
+
 void fileWriter(const char* fileName, int fd)
 {
+    char buff[BUFFER_SIZE];
+
     int fileDesc;
-    fi
+    if((fileDesc = open(fileName, O_RDONLY, NULL)) == -1)
+    {
+        writeFd(STDOUT, "Cannot open file ");
+        writeFd(STDOUT, fileName);
+        writeFd(STDOUT, "\n");
+        _exit(EXIT_FAILURE);
+    }
+
+    readFd(fileDesc,buff,BUFFER_SIZE);
+    writeFd(fd, buff);
+    writeFd(fd, "EOF\n");
 }
 
 void dirWriter(const char* dirName, int fd)
@@ -49,6 +77,8 @@ void dirWriter(const char* dirName, int fd)
         _exit(EXIT_FAILURE);
     }
 
+    char fileName[BUFFER_SIZE];
+    strcpy(fileName,dirName);
     do {
         errno = 0;
         if((dp = readdir(dirp)) != NULL){
@@ -56,6 +86,8 @@ void dirWriter(const char* dirName, int fd)
             {
                 writeFd(fd, dp->d_name);
                 writeFd(fd, "\n");
+                strcat(fileName,dp->d_name);
+                fileWriter(fileName, fd);
             }
         }
     }while(dp != NULL);
@@ -69,7 +101,7 @@ void dirWriter(const char* dirName, int fd)
 
 int main()
 {
-    dirWriter("./dir1", STDOUT);
+    dirWriter("./dir1/", STDOUT);
 
     return 0;
 }
