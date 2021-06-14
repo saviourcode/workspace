@@ -14,6 +14,7 @@
 #define STDERR 3
 
 #define BUFFER_SIZE 100
+#define PATH_NAME 20
 
 void writeFd(int fd, const char* strWrite)
 {
@@ -64,7 +65,7 @@ void fileWriter(const char* fileName, int fd)
 
     readFd(fileDesc,buff,BUFFER_SIZE);
     writeFd(fd, buff);
-    writeFd(fd, "EOF\n");
+    //writeFd(fd, "EOF\n");
 }
 
 void dirWriter(const char* dirName, int fd)
@@ -77,9 +78,10 @@ void dirWriter(const char* dirName, int fd)
         _exit(EXIT_FAILURE);
     }
 
-    char fileName[BUFFER_SIZE];
-    strcpy(fileName,dirName);
     do {
+        char fileName[PATH_NAME];
+        strcpy(fileName,dirName);
+
         errno = 0;
         if((dp = readdir(dirp)) != NULL){
             if(strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0)
