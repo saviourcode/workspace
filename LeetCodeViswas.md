@@ -15,4 +15,9 @@ Time complexity : O(n)
 # Palindrome
 
 
+For left update max and for 
+right update min on the right
+
+
+
 
