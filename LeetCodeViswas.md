@@ -4,15 +4,14 @@
 3. Sliding head and prev
 
 ```java
-  while (head!= null){
-            temp = head.next;
-            head.next = prev;
-            prev = head;
-            head = temp;
-  }
-
-  ```
-  Time complexity : O(n)
-  # Palindrome
+while (head!= null){
+  temp = head.next;
+  head.next = prev;
+  prev = head;
+  head = temp;
+}
+```
+Time complexity : O(n)
+# Palindrome
 
 

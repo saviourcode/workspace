@@ -7,12 +7,12 @@
 
 /* C Standard library */
 #include <string.h> // string C library functions
+#include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 
-#define STDIN 0
-#define STDOUT 1
-#define STDERR 3
+enum {STDIN = 0, STDOUT = 1, STDERR = 2};
+enum {READ_END = 0, WRITE_END = 1};
 
 #define BUFFER_SIZE 100
 #define PATH_NAME 20
@@ -66,6 +66,12 @@ void fileWriter(const char *fileName, int fd)
     }
 
     readFd(fileDesc, buff, BUFFER_SIZE);
+
+    size_t nbytes = strlen(buff);
+    char size[10];
+    snprintf(size, 10, "%u", nbytes);
+
+    writeFd(fd, size);
     writeFd(fd, buff);
     writeFd(fd, "EOF\n");
 }
@@ -140,6 +146,7 @@ int main()
         else if(pidChild[i] == 0){
             // do something with pipes
             writeFd(STDOUT, "I am a child!\n");
+            close(fildesc[i][READ_END]);
             dirWriter(dirNames[i], STDOUT);
             exit(EXIT_SUCCESS);
         }
