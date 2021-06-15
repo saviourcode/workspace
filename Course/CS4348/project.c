@@ -2,6 +2,7 @@
 #include <fcntl.h>     // open, close files
 #include <unistd.h>    // read, write, fork APIs
 #include <sys/types.h> // ssize_t
+#include <sys/wait.h> // Wait for child process to terminate
 #include <dirent.h>    // opendir and readdir
 
 /* C Standard library */
@@ -15,6 +16,7 @@
 
 #define BUFFER_SIZE 100
 #define PATH_NAME 20
+#define NUM_CHILDS 2
 
 void writeFd(int fd, const char *strWrite)
 {
@@ -26,7 +28,7 @@ void writeFd(int fd, const char *strWrite)
 
     if (retnbytes <= 0)
     {
-        char *str = "Write failed!";
+        char *str = "write() Failed!\n";
         nbytes = strlen(str);
         (void)write(STDERR, str, nbytes);
 
@@ -42,7 +44,7 @@ void readFd(int fd, char *buff, size_t nbytes)
 
     if (retnbytes <= 0)
     {
-        char *str = "Read failed!";
+        char *str = "read() Failed!\n";
         nbytes = strlen(str);
         (void)write(STDERR, str, nbytes);
 
@@ -75,7 +77,7 @@ void dirWriter(const char *dirName, int fd)
 
     if ((dirp = opendir(dirName)) == NULL)
     {
-        writeFd(STDOUT, "Opendir Failed\n");
+        writeFd(STDOUT, "opendir() Failed\n");
         _exit(EXIT_FAILURE);
     }
 
@@ -99,14 +101,44 @@ void dirWriter(const char *dirName, int fd)
 
     if (errno != 0)
     {
-        writeFd(STDOUT, "Readdir Failed\n");
+        writeFd(STDOUT, "readdir() Failed\n");
         _exit(EXIT_FAILURE);
     }
 }
 
 int main()
 {
-    dirWriter("./dir1/", STDOUT);
+    char *dirNames[NUM_CHILDS] = {"./dir1/", "./dir2/"};
+    
+    pid_t pidChild[NUM_CHILDS];
+
+    for(size_t i = 0; i < NUM_CHILDS; i++)
+    {
+        // fork a child process
+        pidChild[i] = fork();
+
+        // error occured
+        if(pidChild[i] < 0) { 
+            writeFd(STDOUT, "fork() Failed!\n");
+            exit(EXIT_FAILURE);
+        }
+        // child process
+        else if(pidChild[i] == 0){
+            // do something with pipes
+            writeFd(STDOUT, "I am a child!\n");
+            dirWriter(dirNames[i], STDOUT);
+            exit(EXIT_SUCCESS);
+        }
+    }
+
+    for(size_t i = 0; i < NUM_CHILDS; i++)
+    {
+        if(wait(NULL) == -1)
+        {
+            writeFd(STDOUT, "wait() Failed!\n");
+            exit(EXIT_FAILURE);
+        }
+    }
 
     return 0;
 }
