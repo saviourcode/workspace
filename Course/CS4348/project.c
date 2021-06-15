@@ -151,9 +151,24 @@ int main()
             // do something with pipes
             writeFd(STDERR, "I am a child!\n");
             close(fildesc[i][READ_END]);
-            dirWriter(dirNames[i], fd[i]);
+            close(fildesc[1-i][WRITE_END]);
+            //dirWriter(dirNames[i], fd[i]);
+
+            dirWriter(dirNames[i], fildesc[i][WRITE_END]);
+            close(fildesc[i][WRITE_END]);
+
+            dirReader(dirNames[i], fildesc[1-i][READ_END]);
+            close(fildesc[i-1][READ_END]);
+
             exit(EXIT_SUCCESS);
         }
+    }
+
+    // Close the ends of pipe for parent
+    for(size_t i = 0; i < NUM_CHILDS; i++)
+    {
+        close(filedesc[i][READ_END]);
+        close(filedesc[i][WRITE_END]);
     }
 
     // Wait for Child Processes to complete
