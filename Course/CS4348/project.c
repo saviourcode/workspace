@@ -111,17 +111,17 @@ void dirWriter(const char *dirName, int fd)
     }
 }
 
-void dirRead(const char *dirName, int fd)
+void dirReader(const char *dirName, int fd)
 {
-    
+
 }
 
 int main()
 {
     /* Dummy files */
     int fd[NUM_CHILDS];
-    fd[0] = open("./proc1.txt", O_RDWR | O_TRUNC, NULL);
-    fd[1] = open("./proc2.txt", O_RDWR | O_TRUNC, NULL);
+    fd[0] = open("./proc1.txt", O_RDWR, NULL);
+    fd[1] = open("./proc2.txt", O_RDWR, NULL);
 
     char *dirNames[NUM_CHILDS] = {"./dir1/", "./dir2/"};
 
@@ -157,7 +157,7 @@ int main()
             writeFd(STDERR, "I am a child!\n");
             close(fildesc[i][READ_END]);
             close(fildesc[1-i][WRITE_END]);
-            //dirWriter(dirNames[i], fd[i]);
+            // dirWriter(dirNames[i], fd[i]);
 
             dirWriter(dirNames[i], fildesc[i][WRITE_END]);
             close(fildesc[i][WRITE_END]);
