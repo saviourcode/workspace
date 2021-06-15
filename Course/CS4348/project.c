@@ -111,6 +111,11 @@ void dirWriter(const char *dirName, int fd)
     }
 }
 
+void dirRead(const char *dirName, int fd)
+{
+    
+}
+
 int main()
 {
     /* Dummy files */
@@ -167,8 +172,8 @@ int main()
     // Close the ends of pipe for parent
     for(size_t i = 0; i < NUM_CHILDS; i++)
     {
-        close(filedesc[i][READ_END]);
-        close(filedesc[i][WRITE_END]);
+        close(fildesc[i][READ_END]);
+        close(fildesc[i][WRITE_END]);
     }
 
     // Wait for Child Processes to complete
