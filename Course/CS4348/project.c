@@ -26,7 +26,7 @@ void writeFd(int fd, const char *strWrite)
     nbytes = strlen(strWrite);
     retnbytes = write(fd, strWrite, nbytes);
 
-    if (retnbytes <= 0)
+    if (retnbytes < 0)
     {
         char *str = "write() Failed!\n";
         nbytes = strlen(str);
@@ -42,7 +42,7 @@ void readFd(int fd, char *buff, size_t nbytes)
 
     retnbytes = read(fd, buff, nbytes);
 
-    if (retnbytes <= 0)
+    if (retnbytes < 0)
     {
         char *str = "read() Failed!\n";
         nbytes = strlen(str);
@@ -59,9 +59,9 @@ void fileWriter(const char *fileName, int fd)
     int fileDesc;
     if ((fileDesc = open(fileName, O_RDONLY, NULL)) == -1)
     {
-        writeFd(STDOUT, "Cannot open file ");
-        writeFd(STDOUT, fileName);
-        writeFd(STDOUT, "\n");
+        char strWrite[40];
+        snprintf(strWrite, 40, "cannot open file: \"%s\"\n",fileName);
+        writeFd(STDERR, strWrite);
         _exit(EXIT_FAILURE);
     }
 
@@ -69,11 +69,10 @@ void fileWriter(const char *fileName, int fd)
 
     size_t nbytes = strlen(buff);
     char size[10];
-    snprintf(size, 10, "%u", nbytes);
+    snprintf(size, 10, "%u\n", nbytes);
 
     writeFd(fd, size);
     writeFd(fd, buff);
-    writeFd(fd, "EOF\n");
 }
 
 void dirWriter(const char *dirName, int fd)
@@ -83,7 +82,7 @@ void dirWriter(const char *dirName, int fd)
 
     if ((dirp = opendir(dirName)) == NULL)
     {
-        writeFd(STDOUT, "opendir() Failed\n");
+        writeFd(STDERR, "opendir() Failed\n");
         _exit(EXIT_FAILURE);
     }
 
@@ -107,13 +106,18 @@ void dirWriter(const char *dirName, int fd)
 
     if (errno != 0)
     {
-        writeFd(STDOUT, "readdir() Failed\n");
+        writeFd(STDERR, "readdir() Failed\n");
         _exit(EXIT_FAILURE);
     }
 }
 
 int main()
 {
+    /* Dummy files */
+    int fd[NUM_CHILDS];
+    fd[0] = open("./proc1.txt", O_RDWR | O_TRUNC, NULL);
+    fd[1] = open("./proc2.txt", O_RDWR | O_TRUNC, NULL);
+
     char *dirNames[NUM_CHILDS] = {"./dir1/", "./dir2/"};
 
     // Make pipes
@@ -124,7 +128,7 @@ int main()
     {
         if((status = pipe(fildesc[i])) == -1)
         {
-            writeFd(STDOUT, "pipe() Failed!\n");
+            writeFd(STDERR, "pipe() Failed!\n");
             exit(EXIT_FAILURE);
         }
     }
@@ -139,15 +143,15 @@ int main()
 
         // error occured
         if(pidChild[i] < 0) { 
-            writeFd(STDOUT, "fork() Failed!\n");
+            writeFd(STDERR, "fork() Failed!\n");
             exit(EXIT_FAILURE);
         }
         // child process
         else if(pidChild[i] == 0){
             // do something with pipes
-            writeFd(STDOUT, "I am a child!\n");
+            writeFd(STDERR, "I am a child!\n");
             close(fildesc[i][READ_END]);
-            dirWriter(dirNames[i], STDOUT);
+            dirWriter(dirNames[i], fd[i]);
             exit(EXIT_SUCCESS);
         }
     }
@@ -157,7 +161,7 @@ int main()
     {
         if(wait(NULL) == -1)
         {
-            writeFd(STDOUT, "wait() Failed!\n");
+            writeFd(STDERR, "wait() Failed!\n");
             exit(EXIT_FAILURE);
         }
     }

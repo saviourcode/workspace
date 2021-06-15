@@ -1,4 +1,0 @@
-Reverse a linked list
-        Use a temp variable for head.next
-Idea : Break the heads pointer and point to previous
-Sliding head and prev
