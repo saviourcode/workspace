@@ -109,7 +109,21 @@ void dirWriter(const char *dirName, int fd)
 int main()
 {
     char *dirNames[NUM_CHILDS] = {"./dir1/", "./dir2/"};
+
+    // Make pipes
+    int fildesc[NUM_CHILDS][2];
+    int status;
+
+    for(size_t i = 0; i < NUM_CHILDS; i++)
+    {
+        if((status = pipe(fildesc[i])) == -1)
+        {
+            writeFd(STDOUT, "pipe() Failed!\n");
+            exit(EXIT_FAILURE);
+        }
+    }
     
+    // Fork childs and do something
     pid_t pidChild[NUM_CHILDS];
 
     for(size_t i = 0; i < NUM_CHILDS; i++)
@@ -131,6 +145,7 @@ int main()
         }
     }
 
+    // Wait for Child Processes to complete
     for(size_t i = 0; i < NUM_CHILDS; i++)
     {
         if(wait(NULL) == -1)
