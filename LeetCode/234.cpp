@@ -61,17 +61,29 @@ public:
         
         return true;
     }
+
+    void reversell(ListNode *head)
+    {
+        ListNode *prev = NULL;
+        while(head != NULL)
+        {
+            ListNode *next_node = head->next;
+            head->next = prev;
+            prev = head;
+            head = next_node;
+        }
+    }
 };
 
 int main(){
     Solution sol;
     ListNode head(1);
-    ListNode node1(2);
+    ListNode node1(1);
     head.next = &node1;
-    //ListNode node2(2);
-    //node1.next = &node2;
-    //ListNode node3(3);
-    //node2.next = &node3;
+    ListNode node2(2);
+    node1.next = &node2;
+    ListNode node3(1);
+    node2.next = &node3;
 
-    cout << sol.isPalindrome(&head);
+    sol.reversell(&head);
 }
