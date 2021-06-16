@@ -21,6 +21,10 @@ enum {READ_END = 0, WRITE_END = 1};
 #define LENGTH 10
 #define BUFFER_SIZE 100
 
+/* Dummy files */
+int fdTEST[NUM_CHILDS];
+    
+
 void writeFd(int fd, const char *strWrite)
 {
     size_t nbytes;     // Store number of bytes of string
@@ -55,7 +59,7 @@ void writeFdPipe(int fd, const char *strWrite, size_t nbytes)
     }
 }
 
-void readFd(int fd, char *buff, size_t nbytes)
+ssize_t readFd(int fd, char *buff, size_t nbytes)
 {
     ssize_t retnbytes;
 
@@ -69,6 +73,8 @@ void readFd(int fd, char *buff, size_t nbytes)
 
         _exit(EXIT_FAILURE);
     }
+
+    return retnbytes;
 }
 
 void fileWriter(const char *fileName, int fd)
@@ -115,7 +121,7 @@ void dirWriter(const char *dirName, int fd)
         {
             if (strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0)
             {
-                char fileName[20] = {0};
+                char fileName[FILENAME] = {0};
                 strcat(fileName, dp->d_name);
                 strcat(fileName, "\n");
                 writeFdPipe(fd, fileName, sizeof(fileName));
@@ -132,17 +138,30 @@ void dirWriter(const char *dirName, int fd)
     }
 }
 
-void dirReader(const char *dirName, int fd)
+void dirReader(const char *dirName, int fd, int i)
 {
-    char fileName[20]
+    char fileName[FILENAME] = {0};
+    char size[LENGTH] = {0};
+    char buffer[BUFFER_SIZE] = {0};
+    
+    while(readFd(fd, fileName, FILENAME))
+    {
+        writeFd(fdTEST[i], fileName);
+        readFd(fd, size, LENGTH);
+        writeFd(fdTEST[i], size);
+        if(strcmp(size,"0") == 0)
+            continue;
+        readFd(fd, buffer, BUFFER_SIZE);
+        writeFd(fdTEST[i], "Now reading buffer\n");
+        writeFd(fdTEST[i], buffer);
+    }
+        
 }
 
 int main()
 {
-    /* Dummy files */
-    int fd[NUM_CHILDS];
-    fd[0] = open("./proc1.txt", O_RDWR, NULL);
-    fd[1] = open("./proc2.txt", O_RDWR, NULL);
+    fdTEST[0] = open("./proc1", O_RDWR | O_TRUNC, NULL);
+    fdTEST[1] = open("./proc2", O_RDWR | O_TRUNC, NULL);
 
     char *dirNames[NUM_CHILDS] = {"./dir1/", "./dir2/"};
 
@@ -179,12 +198,12 @@ int main()
             close(fildesc[i][READ_END]);
             close(fildesc[1-i][WRITE_END]);
 
-            dirWriter(dirNames[i], fd[i]);
+            //dirWriter(dirNames[i], fd[i]);
 
             dirWriter(dirNames[i], fildesc[i][WRITE_END]);
             close(fildesc[i][WRITE_END]);
 
-            dirReader(dirNames[i], fildesc[1-i][READ_END]);
+            dirReader(dirNames[i], fildesc[1-i][READ_END],i);
             close(fildesc[i-1][READ_END]);
 
             exit(EXIT_SUCCESS);
