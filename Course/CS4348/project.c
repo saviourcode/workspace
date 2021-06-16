@@ -113,7 +113,8 @@ void dirWriter(const char *dirName, int fd)
 
 void dirReader(const char *dirName, int fd)
 {
-
+    FILE *file = fopen(fd, "r");
+    // while(fgets(fd, ))
 }
 
 int main()
