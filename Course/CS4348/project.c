@@ -14,9 +14,12 @@
 enum {STDIN = 0, STDOUT = 1, STDERR = 2};
 enum {READ_END = 0, WRITE_END = 1};
 
-#define BUFFER_SIZE 100
 #define PATH_NAME 20
 #define NUM_CHILDS 2
+
+#define FILENAME 20
+#define LENGTH 10
+#define BUFFER_SIZE 100
 
 void writeFd(int fd, const char *strWrite)
 {
@@ -33,6 +36,22 @@ void writeFd(int fd, const char *strWrite)
         (void)write(STDERR, str, nbytes);
 
         _exit(EXIT_FAILURE);
+    }
+}
+
+void writeFdPipe(int fd, const char *strWrite, size_t nbytes)
+{
+    ssize_t retnbytes; // Store the value returned from read and write
+
+    retnbytes = write(fd, strWrite, nbytes);
+
+    if(retnbytes < 0)
+    {
+        char *str = "write() Failed!\n";
+        nbytes = strlen(str);
+        (void)write(STDERR, str, nbytes);
+
+        _exit(EXIT_FAILURE); 
     }
 }
 
@@ -68,11 +87,11 @@ void fileWriter(const char *fileName, int fd)
     readFd(fileDesc, buff, BUFFER_SIZE);
 
     size_t nbytes = strlen(buff);
-    char size[10];
+    char size[LENGTH];
     snprintf(size, 10, "%u\n", nbytes);
 
-    writeFd(fd, size);
-    writeFd(fd, buff);
+    writeFdPipe(fd, size, LENGTH);
+    writeFdPipe(fd, buff, BUFFER_SIZE);
 }
 
 void dirWriter(const char *dirName, int fd)
@@ -88,18 +107,20 @@ void dirWriter(const char *dirName, int fd)
 
     do
     {
-        char fileName[PATH_NAME] = {0};
-        strcpy(fileName, dirName);
+        char fileLocation[PATH_NAME] = {0};
+        strcpy(fileLocation, dirName);
 
         errno = 0;
         if ((dp = readdir(dirp)) != NULL)
         {
             if (strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0)
             {
-                writeFd(fd, dp->d_name);
-                writeFd(fd, "\n");
+                char fileName[20] = {0};
                 strcat(fileName, dp->d_name);
-                fileWriter(fileName, fd);
+                strcat(fileName, "\n");
+                writeFdPipe(fd, fileName, sizeof(fileName));
+                strcat(fileLocation, dp->d_name);
+                fileWriter(fileLocation, fd);
             }
         }
     } while (dp != NULL);
@@ -113,8 +134,7 @@ void dirWriter(const char *dirName, int fd)
 
 void dirReader(const char *dirName, int fd)
 {
-    FILE *file = fopen(fd, "r");
-    // while(fgets(fd, ))
+    char fileName[20]
 }
 
 int main()
@@ -158,7 +178,8 @@ int main()
             writeFd(STDERR, "I am a child!\n");
             close(fildesc[i][READ_END]);
             close(fildesc[1-i][WRITE_END]);
-            // dirWriter(dirNames[i], fd[i]);
+
+            dirWriter(dirNames[i], fd[i]);
 
             dirWriter(dirNames[i], fildesc[i][WRITE_END]);
             close(fildesc[i][WRITE_END]);
