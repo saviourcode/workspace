@@ -18,3 +18,19 @@ Result is stored in prev_ptr;
 
 3. Time Complexity : O(n);
     Space Complexity: O(1);
+
+# Convert Sorted Array to Binary Search Tree
+1. Requirements:
+    1. Since the array is sorted use Divide and Conquer Algorithm
+    2. Find the middle element and insert is into the tree recursively from left and right
+2. Pseudo Code
+```c
+solve(vec, start, end)
+{
+    mid = start - (start - end)/2;
+    TreeNode *Node = new TreeNode(vec(nums));
+
+    Node->left = solve(vec, start, mid-1);
+    Node->right = solve(vec, mid+1, end);
+}
+```

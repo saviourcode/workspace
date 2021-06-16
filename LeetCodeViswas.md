@@ -18,6 +18,10 @@ Time complexity : O(n)
 For left update max and for 
 right update min on the right
 
+# Convert Sorted Array to BST
+## Key Idea Sorted Array implies use Divide and Conquer technique
+
+
 
 
 
