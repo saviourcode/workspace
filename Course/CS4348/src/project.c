@@ -102,8 +102,8 @@ void fileWriter(const char *fileName, int fd)
     char buff[BUFFER_SIZE] = {0}; // Critical to zero out or else buffer contains random values
 
     int fileDesc;
-    // Check for error
 
+    // Check for error
     if ((fileDesc = open(fileName, O_RDONLY, NULL)) == -1)
     {
         char strWrite[40];
@@ -112,13 +112,20 @@ void fileWriter(const char *fileName, int fd)
         _exit(EXIT_FAILURE);
     }
 
+    // Read the contents of file, max till BUFFER_SIZE
     readFd(fileDesc, buff, BUFFER_SIZE);
 
+    // Find the size of the file
     size_t nbytes = strlen(buff);
+
     char size[LENGTH];
+    // Convert size to long int
     snprintf(size, 10, "%lu\n", nbytes);
 
+    // Write the size of the file to the file descriptor
     writeFdBytes(fd, size, LENGTH);
+
+    // If file size is not equal to zero then write the contents of file to file descriptor
     if(nbytes!=0)
         writeFdBytes(fd, buff, BUFFER_SIZE);
 }
@@ -145,13 +152,19 @@ void dirWriter(const char *dirName, int fd)
         strcpy(fileLocation, dirName);
 
         errno = 0;
+
+        // Read the file name from the directory
         if ((dp = readdir(dirp)) != NULL)
         {
+            // Ignore file names of "." and ".."
             if (strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0)
             {
                 char fileName[FILENAME] = {0};
                 strcat(fileName, dp->d_name);
+
+                // Write the filename to the file descriptor
                 writeFdBytes(fd, fileName, sizeof(fileName));
+
                 strcat(fileLocation, dp->d_name);
                 fileWriter(fileLocation, fd);
             }
@@ -177,25 +190,30 @@ void dirReader(const char *dirName, int fd)
     char buffer[BUFFER_SIZE] = {0};
     size_t retSize;
 
+    // Check if there is any files present in the file descriptor
     while(readFd(fd, fileName, FILENAME))
     {
         char fileDirPath[PATH_NAME] = {0};
         strcat(fileDirPath,dirName);
         strcat(fileDirPath,fileName);
 
+        // Read the size of files
         readFd(fd, size, LENGTH);
 
+        // Convert back the size of file to long int
         retSize = strtol(size,NULL,10);
         if(retSize== 0)
             continue;
 
+        // Read the contents of file to the buffer, max till BUFFER_SIZE
         readFd(fd, buffer, BUFFER_SIZE);
 
-        // Check for error
+        // Check if the file name with same name is present in the directory, if yes then don't alter it
         if(access(fileDirPath, F_OK) == 0)
                 writeFd(STDOUT,"File already exists! Won't overwrite\n");
         else
         {
+            // Create a new file and write the contents to it
             int fdwr = open(fileDirPath, O_WRONLY | O_TRUNC | O_CREAT | O_EXCL, 0644);
             write(fdwr,buffer,retSize);
             close(fdwr);
@@ -282,5 +300,6 @@ int main()
         }
     }
 
+    // Return 0 on Success
     return 0;
 }
