@@ -3,6 +3,7 @@
 #include <unistd.h>    // read, write, fork APIs
 #include <sys/types.h> // ssize_t
 #include <sys/wait.h> // Wait for child process to terminate
+#include <sys/stat.h> // File stats
 #include <dirent.h>    // opendir and readdir
 
 /* C Standard library */
@@ -23,7 +24,6 @@ enum {READ_END = 0, WRITE_END = 1};
 // Macros to store file parameters
 #define FILENAME 20
 #define LENGTH 10
-#define BUFFER_SIZE 4096
 
 /* Function Description:
  * Write the given char[] to the specified file descriptor.
@@ -99,8 +99,6 @@ ssize_t readFd(int fd, char *buff, size_t nbytes)
  */
 void fileWriter(const char *fileName, int fd)
 {
-    char buff[BUFFER_SIZE] = {0}; // Critical to zero out or else buffer contains random values
-
     int fileDesc;
 
     // Check for error
@@ -112,22 +110,36 @@ void fileWriter(const char *fileName, int fd)
         _exit(EXIT_FAILURE);
     }
 
-    // Read the contents of file, max till BUFFER_SIZE
-    readFd(fileDesc, buff, BUFFER_SIZE);
+    struct stat fileStats;
+    fstat(fileDesc, &fileStats);
+    off_t fileSize = fileStats.st_size;
 
-    // Find the size of the file
-    size_t nbytes = strlen(buff);
+    printf("%lu", fileSize);
+
+    char *buff;
+    buff = calloc(fileSize, sizeof(char)); // Critical to zero out or else buffer contains random values
+    if(buff == NULL)
+    {
+            writeFd(STDERR, "calloc() Failed!\n");
+            _exit(EXIT_FAILURE);
+    }
+
+    // Read the contents of file, max till BUFFER_SIZE
+    readFd(fileDesc, buff, fileSize);
 
     char size[LENGTH];
     // Convert size to long int
-    snprintf(size, 10, "%lu\n", nbytes);
+    snprintf(size, 10, "%lu\n", fileSize);
 
     // Write the size of the file to the file descriptor
     writeFdBytes(fd, size, LENGTH);
 
     // If file size is not equal to zero then write the contents of file to file descriptor
-    if(nbytes!=0)
-        writeFdBytes(fd, buff, BUFFER_SIZE);
+    if(fileSize!=0)
+        writeFdBytes(fd, buff, fileSize);
+    
+    // Free the buffer
+    free(buff);
 }
 
 /* Function Description:
@@ -187,7 +199,7 @@ void dirReader(const char *dirName, int fd)
 {
     char fileName[FILENAME] = {0};
     char size[LENGTH] = {0};
-    char buffer[BUFFER_SIZE] = {0};
+    char *buff;
     size_t retSize;
 
     // Check if there is any files present in the file descriptor
@@ -205,8 +217,15 @@ void dirReader(const char *dirName, int fd)
         if(retSize== 0)
             continue;
 
+        buff = calloc(retSize, sizeof(char)); // Critical to zero out or else buffer contains random values
+        if(buff == NULL)
+        {
+            writeFd(STDERR, "calloc() Failed!\n");
+            _exit(EXIT_FAILURE);
+        }
+
         // Read the contents of file to the buffer, max till BUFFER_SIZE
-        readFd(fd, buffer, BUFFER_SIZE);
+        readFd(fd, buff, retSize);
 
         // Check if the file name with same name is present in the directory, if yes then don't alter it
         if(access(fileDirPath, F_OK) == 0)
@@ -215,9 +234,12 @@ void dirReader(const char *dirName, int fd)
         {
             // Create a new file and write the contents to it
             int fdwr = open(fileDirPath, O_WRONLY | O_TRUNC | O_CREAT | O_EXCL, 0644);
-            write(fdwr,buffer,retSize);
+            write(fdwr,buff,retSize);
             close(fdwr);
         }
+
+        // free the buffer
+        free(buff);
     }
 }
 
@@ -231,7 +253,13 @@ void dirReader(const char *dirName, int fd)
  */
 int main()
 {
-    char *dirNames[NUM_CHILDS] = {"./dir1/", "./dir2/"};
+    char dirNames[NUM_CHILDS][PATH_NAME];
+
+    for(size_t i = 0; i < NUM_CHILDS; i++)
+    {
+        printf("Please enter the directory of child %ld : ", i);
+        scanf("%s", dirNames[i]);
+    }
 
     // Make pipes
     int fildesc[NUM_CHILDS][2];
