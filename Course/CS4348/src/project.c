@@ -23,7 +23,7 @@ enum {READ_END = 0, WRITE_END = 1};
 // Macros to store file parameters
 #define FILENAME 20
 #define LENGTH 10
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 1024*1024 //1MB
 
 /* Function Description:
  * Write the given char[] to the specified file descriptor.
@@ -231,7 +231,13 @@ void dirReader(const char *dirName, int fd)
  */
 int main()
 {
-    char *dirNames[NUM_CHILDS] = {"./dir1/", "./dir2/"};
+    char dirNames[NUM_CHILDS][PATH_NAME];
+
+    for(size_t i = 0; i < NUM_CHILDS; i++)
+    {
+        printf("Please enter the directory of child %ld : ", i);
+        scanf("%s", dirNames[i]);
+    }
 
     // Make pipes
     int fildesc[NUM_CHILDS][2];
