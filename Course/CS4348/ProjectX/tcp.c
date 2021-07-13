@@ -93,5 +93,37 @@ void server_accept_thread()
 
 void client_send_thread(int num_of_clients, int ID, char client_IP[][11])
 {
+    char message[256];
+    int m;
+    while(1)
+    {
+        printf("Please enter the message: ");
+        bzero(&message, sizeof(message));
+        scanf("%s", message);
 
+        printf("Please enter the machine to send: ");
+        scanf("%d",&m);
+
+        // create the server socket
+        int network_socket;
+        network_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+        // define the server address
+        struct sockaddr_in server_address;
+        bzero(&server_address, sizeof(server_address));
+        server_address.sin_family = AF_INET;
+        server_address.sin_port = htons(SERVER_PORT);
+        
+        if(inet_pton(AF_INET, client_IP[m-1], &server_address.sin_addr) <= 0)
+            printf("Error on inet");
+        
+        int connection_status = connect(network_socket, (struct sockaddr *) &server_address, sizeof(server_address));
+        // check for error with the connection
+        if(connection_status == -1)
+            printf("There was an error making a connection to the remote socket \n");
+
+        write(network_socket, message, strlen(message));
+
+        close(network_socket);
+    }
 }
