@@ -1,0 +1,1 @@
+Consider a computation task in which 90% of the work is parallelizable, while the remaining 10% of the work can only be executed sequentially. If the task is run on a single processor, it takes 100 time units to finish. If 9 processors are available to execute the task, how much time does it take for the task to complete? State your answer rounded to the nearest integer.

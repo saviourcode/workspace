@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZNR1PPSRJX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-ZNR1PPSRJX');
+    </script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+        integrity="sha512-oHDEc8Xed4hiW6CxD7qjbnI+B07vDdX7hEPTvn9pSZO1bcRqHp8mj9pyr+8RVC2GmtEfI2Bi9Ke9Ass0as+zpg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./style.css">
+    <title>Heart Stroke Predictor</title>
+</head>
+
+<body>
+    <section>
+        <div class="box">
+            <div class="box-alert">
+                <div class="box-inside" id="boxalert">
+                    <div class="alert alert-warning" role="alert">
+                        <p><strong>Result: </strong> <span id="boxtext"></span>
+                            <button id="myBtn" onClick="$('#boxalert').hide();" type="button" class="close"
+                                aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="box-form">
+                <form class="form-horizontal" name="inputform" id="apiform">
+                    <fieldset>
+
+                        <!-- Form Name -->
+                        <legend><i class="fas fa-heartbeat"></i> Heart Stroke Predictor</legend>
+
+                        <!-- Gender -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="gender">Gender</label>
+                            <div class="col-md-4">
+                                <select id="gender" name="gender" class="form-control">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Age-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="age">Age</label>
+                            <div class="col-md-4">
+                                <input id="age" name="age" type="text" placeholder="Input Age"
+                                    class="form-control input-md" required="">
+
+                            </div>
+                        </div>
+
+                        <!-- Hypertension -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="hypertension">Hypertension</label>
+                            <div class="col-md-4">
+                                <select id="hypertension" name="hypertension" class="form-control">
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Heart Disease -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="heart_disease">Heart Disease</label>
+                            <div class="col-md-4">
+                                <select id="heart_disease" name="heart_disease" class="form-control">
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Ever Married -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="ever_married">Ever Married (But Don't!)</label>
+                            <div class="col-md-4">
+                                <select id="ever_married" name="ever_married" class="form-control">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Work Type -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="work_type">Work Type</label>
+                            <div class="col-md-4">
+                                <select id="work_type" name="work_type" class="form-control">
+                                    <option value="Private">Private</option>
+                                    <option value="Self-employed">Self Employed</option>
+                                    <option value="Govt_job">Government Job</option>
+                                    <option value="children">Children</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Residence Type -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="Residence_type">Residence Type</label>
+                            <div class="col-md-4">
+                                <select id="Residence_type" name="Residence_type" class="form-control">
+                                    <option value="Urban">Urban</option>
+                                    <option value="Rural">Rural</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Avg Glucose Level-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="avg_glucose_level">Avg Glucose Level</label>
+                            <div class="col-md-4">
+                                <input id="avg_glucose_level" name="avg_glucose_level" type="text"
+                                    placeholder="Input Sugar" class="form-control input-md" required="">
+
+                            </div>
+                        </div>
+
+                        <!-- BMI-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="bmi">BMI</label>
+                            <div class="col-md-4">
+                                <input id="bmi" name="bmi" type="text" placeholder="Input BMI"
+                                    class="form-control input-md" required="">
+
+                            </div>
+                        </div>
+
+                        <!-- Smoking Status -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="smoking_status">Smoking Status</label>
+                            <div class="col-md-4">
+                                <select id="smoking_status" name="smoking_status" class="form-control">
+                                    <option value="smokes">Smokes</option>
+                                    <option value="never smoked">Never Smoked</option>
+                                    <option value="formerly smoked">Formerly Smoked</option>
+                                    <option value="Unknown">Unknown</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Button -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="singlebutton"></label>
+                            <div class="col-md-4">
+                                <input type="submit" value="Submit" class="btn btn-primary">
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </form>
+            </div>
+
+        </div>
+
+    </section>
+
+    <script src="./script.js"></script>
+
+</body>
+
+</html>

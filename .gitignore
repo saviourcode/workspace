@@ -6,3 +6,4 @@ controller
 input_*
 output_*
 topology
+node_modules
